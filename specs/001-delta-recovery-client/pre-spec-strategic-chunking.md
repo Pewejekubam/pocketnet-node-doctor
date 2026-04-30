@@ -1,11 +1,17 @@
 ---
-version: 1.0.0
+version: 1.0.1
 status: approved
 created: 2026-04-30
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: pre-spec.md
 changelog:
+  - version: 1.0.1
+    date: 2026-04-30
+    summary: Patch — Chunk 001 implementation complete; Progress Tracker row + per-chunk addendum recording the auto-chunk-runner run signature
+    changes:
+      - "Progress Tracker: Chunk 001 status → Implementation Complete — Awaiting Merge"
+      - "Per-Chunk Addenda: appended Chunk 001 run signature (run id, stage durations, halt + recovery, FR/SC counts, gate identifications, deferrals)"
   - version: 1.0.0
     date: 2026-04-30
     summary: Approval milestone — Stage 6 formally exited; ready to drive chunk-runner dispatch
@@ -114,7 +120,7 @@ Chunk 005 — Release Polish
 
 | Chunk | Title | FRs | SCs | Status |
 |-------|-------|-----|-----|--------|
-| 001 | Server-Side: Manifest Schema + Chunk Store Generation | CR001-001..008 | SC-007 (drill prerequisite) | Pending |
+| 001 | Server-Side: Manifest Schema + Chunk Store Generation | CR001-001..008 | SC-007 (drill prerequisite) | Implementation Complete — Awaiting Merge |
 | 002 | Client Foundation + Diagnose | FR-001, FR-002, FR-003, FR-004, FR-005, FR-010, FR-011, FR-012, FR-013, FR-017, FR-018 | SC-001 (timing half), SC-002, SC-006 | Pending |
 | 003 | Client Apply | FR-006, FR-007, FR-008, FR-009, FR-014, FR-015, FR-016, FR-019, FR-020 | SC-001 (fetch-size half), SC-003, SC-004, SC-005 | Pending |
 | 004 | End-to-End Drill + Network Resilience | (no new FRs; integration of all prior) | SC-007, SC-008 | Pending |
@@ -519,6 +525,23 @@ Per-chunk validation items beyond the integration-gate checklists.
 - [ ] **Manifest schema documented** in `pocketnet_create_checkpoint` repo so future canonical formats can preserve compatibility intentionally.
 - [ ] **Trust-root constant publication channel documented** so doctor builds can pin the right value at build time.
 - [ ] **Smoke test:** at least one published canonical's manifest fetched and trust-root-verified by an out-of-band consumer (curl + sha256sum) before any doctor build consumes it.
+
+#### Chunk 001 run signature (auto-chunk-runner + manual verify)
+
+- **Run ID:** `f5df963f-6971-4d77-b75e-76eac70d2fdf`
+- **Window:** auto pipeline 2026-04-30T14:35:12Z → halt at 2026-04-30T15:33:00Z; manual `/speckit.superb.verify` completion 2026-04-30T16:18Z
+- **Feature branch + dir:** `002-001-delta-recovery-client-chunk-001` / `specs/002-001-delta-recovery-client-chunk-001/` (the `002-` prefix is `/speckit.specify`'s spec-ordinal iteration; not a runner defect)
+- **Auto stage durations (s):** specify 381, clarify 266, plan 593, tasks 485, analyze 236, superb_review 163, superb_tdd 172, implement 1097. Auto subtotal: 3393s (~57 min).
+- **Halt + recovery:** auto-runner halted at `superb_verify` (74s) on a bridge-resolver dependency — `verification-before-completion` skill present in the Claude plugin cache but absent from `~/.agents/skills/`. Two-part remediation, applied:
+  1. Project-agnostic prompt-tune on `tools/chunk-runner/prompts/superb-verify.md` granting it the same plugin-cache fallback latitude `superb-tdd` already had.
+  2. Manual `/speckit.superb.verify` invocation with the patched prompt context; passed cleanly.
+- **Counts:** 53 / 53 tasks completed, 9 phase commits. 11 / 11 harness predicates green in fresh manual verify run. 8 CR001-* + 3 CSC001-* + 3 BC-* (14 spec requirements) verified.
+- **Gate evidence:**
+  - Gate 001-Schema → 002 → `evidence/gate-001-schema-to-002.md`
+  - Gate 001 → 002 → `evidence/gate-001-to-002.md`
+  - `CONTRACT-HANDOFF.md` documents the eleven-step harness invocation for `delt.3`'s deployment-time live re-run.
+- **Spec-status flip:** Implemented → Verified (committed on the feature branch).
+- **Outstanding (non-blocking):** `delt.3` (server-side implementation in the `pocketnet_create_checkpoint` sibling repo) is the contract consumer; this chunk delivered the contract artifacts + verification harness only. CSC001-003 live-canonical re-run deferred to `delt.3` deployment per `CONTRACT-HANDOFF.md`. BC-003 (operator-scale concurrent fetches) inherited from existing distribution channel; not load-tested in this chunk.
 
 ### Chunk 002 addenda
 

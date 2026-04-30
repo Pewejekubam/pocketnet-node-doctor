@@ -1,0 +1,26 @@
+--- cc-on-other-sqlite.json (schema rejects) ---
+Schema validation errors were encountered.
+  fixtures/negative/cc-on-other-sqlite.json::$.entries[3]: {'change_counter': 0, 'entry_kind': 'sqlite_pages', 'pages': [{'hash': '0000000000000000000000000000000000000000000000000000000000000000', 'offset': 0}], 'path': 'pocketdb/other.sqlite3'} is not valid under any of the given schemas
+  Underlying errors caused this.
+
+  Best Match:
+    $.entries[3]: {'change_counter': 0, 'entry_kind': 'sqlite_pages', 'pages': [{'hash': '0000000000000000000000000000000000000000000000000000000000000000', 'offset': 0}], 'path': 'pocketdb/other.sqlite3'} should not be valid under {'required': ['change_counter']}
+  Best Deep Match:
+    $.entries[3].entry_kind: 'whole_file' was expected
+
+  2 other errors were produced. Use '--verbose' to see all errors.
+verify-schema VIOLATION: fixtures/negative/cc-on-other-sqlite.json does not validate against <feature-dir>/contracts/manifest.schema.json
+EXPECTED FAIL (rc=1)
+--- cc-missing-on-main.json (schema rejects) ---
+Schema validation errors were encountered.
+  fixtures/negative/cc-missing-on-main.json::$.entries[0]: {'entry_kind': 'sqlite_pages', 'pages': [{'hash': 'a5da813859d0c890114890b3126c728786362bea0dfb507235c95a76cfe96e72', 'offset': 0}, {'hash': '79fe80c81f701a2e9af6bba659ff99e143d581a3ebf177474ed2ee8c0fa14ccc', 'offset': 4096}, {'hash': 'c907d7aa0ea02fc23eaec22a0a3329b824bc1c2c17ed2759ab427a8e9cc28983', 'offset': 8192}, {'hash': '3a370c921e1d689daae1f95c1bc8fd70c3a2294d9a602603866c88f1678133ed', 'offset': 12288}], 'path': 'pocketdb/main.sqlite3'} is not valid under any of the given schemas
+  Underlying errors caused this.
+
+  Best Match:
+    $.entries[0]: 'change_counter' is a required property
+  Best Deep Match:
+    $.entries[0].entry_kind: 'whole_file' was expected
+
+  2 other errors were produced. Use '--verbose' to see all errors.
+verify-schema VIOLATION: fixtures/negative/cc-missing-on-main.json does not validate against <feature-dir>/contracts/manifest.schema.json
+EXPECTED FAIL (rc=1)

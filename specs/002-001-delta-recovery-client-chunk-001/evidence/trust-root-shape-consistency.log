@@ -1,0 +1,30 @@
+=== T010: trust-root-format.md byte-shape vs data-model.md Trust-Root section ===
+--- trust-root-format.md on-wire shape ---
+## On-wire shape
+
+The response body is a **plain-text** file with this exact byte structure:
+
+```
+[64 lowercase hex chars][LF (0x0A)]
+```
+
+- Total body length: **65 bytes**.
+- Hex chars: `0–9`, `a–f`. Uppercase is invalid. No `0x` prefix. No surrounding whitespace, no quotes, no JSON wrapper.
+- Trailing single `\n`. No `\r\n`. No multiple newlines.
+
+## HTTP response shape
+--- data-model.md Trust-Root section ---
+# Phase 1 Data Model: Manifest, Per-File Entry, Chunk, Trust-Root
+
+**Branch**: `002-001-delta-recovery-client-chunk-001` | **Date**: 2026-04-30 | **Plan**: [plan.md](plan.md)
+
+## Scope
+
+--- Consistency assertions ---
+
+--- Consistency assertions ---
+OK: '64 lowercase hex chars' phrasing matches across both docs
+OK: '65 bytes' total length asserted in both docs
+OK: both contracts/trust-root-format.md and data-model.md document the trailing single LF (0x0A)
+    - contracts/trust-root-format.md:23 — Trailing single \n. No \r\n. No multiple newlines.
+    - data-model.md:114 — UTF-8 text file containing exactly 64 lowercase hex chars followed by a single \n. Total byte length: 65.
