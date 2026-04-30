@@ -1,11 +1,20 @@
 ---
-version: 0.2.0
+version: 0.2.1
 status: draft
 created: 2026-04-30
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: pre-spec.md
 changelog:
+  - version: 0.2.1
+    date: 2026-04-30
+    summary: Patch — apply Stage 5 delta-audit findings against chunking v0.2.0 net-new content (5 findings; pre-spec write-back findings handled in pre-spec v0.3.3)
+    changes:
+      - "XDC-F01-D closed: exit-code 13 collision resolved — manifest-format-version-unrecognized refusal moved from apply-time block (10..19) to pre-flight block as code 7; categorization rule extended to '2..7 = pre-flight refusals.' Chunk 3's apply-time codes leave 13 reserved (renumbered downstream codes preserved at 14, 15 to minimize operator-wrapper churn if any external doc previously cited them)"
+      - "CSA-11-F01-D closed: Chunk 5 signing-scheme SSR rewritten to acknowledge Authenticode (X.509) and GPG (OpenPGP) as distinct cryptographic systems administratively maintained by the same publisher; new Chunk 5 SSR pins signing-key custody (CI provider's encrypted secret store, retrieved at sign-time only, never persisted on a runner)"
+      - "CSA-05-F01-D closed: Gate 1-Schema → 2 predicate 1 pinned to a JSON Schema (Draft 2020-12) document at a stable URL"
+      - "CSA-11-F02-D closed: Chunk 4 SC-008 mapping reworded — iptables `REJECT --reject-with tcp-reset` is the connection-kill primitive; `tc` is optional rate-shaping for a constrained-link simulation, not part of the SC-008 verification path"
+      - "CSA-09-F01-D closed: 'reproducibly built' dropped from Chunk 5 behavioral criteria (operator-verifiability is preserved by signature verification alone; reproducible builds remain a non-v1 nice-to-have)"
   - version: 0.2.0
     date: 2026-04-30
     summary: Stage 6 refinement — apply all Stage 5 chunking-audit findings (pre-spec-strategic-chunking-audit.md v0.1.0)
@@ -128,7 +137,7 @@ After One-Time Setup completes, before Chunk 1 begins.
 
 A Chunk 1 sub-gate. After Chunk 1's manifest schema is authored and published as a contract, before Chunk 2 begins. Chunk 1 may continue developing the chunk store after this sub-gate; Chunk 2 begins in parallel.
 
-- [ ] **Manifest schema document published** in the project's repo or a stable URL — JSON schema or equivalent that enumerates every required field, including `format_version`, `canonical_identity`, per-file entries with page-grid offsets for `main.sqlite3`, and the reserved `trust_anchors` block.
+- [ ] **Manifest schema document published** at a stable URL as a JSON Schema (Draft 2020-12, or the current draft at time of authoring). The schema enumerates every required field, including `format_version`, `canonical_identity`, per-file entries with page-grid offsets for `main.sqlite3`, and the reserved `trust_anchors` block.
 - [ ] **Canonical-form serialization rule cited** by the schema document (sorted keys, no insignificant whitespace, UTF-8) so Chunk 2's plan-format library and Chunk 1's manifest generator hash identically.
 
 ### Gate 1 → 2: Chunk Store Available (full)
@@ -148,7 +157,8 @@ After Chunk 2 merges, before Chunk 3 begins.
 - [ ] **Diagnose on a fixture identical to canonical produces a zero-entry plan** (per SC-002).
 - [ ] **Plan self-hash verifies** — recomputing SHA-256 over the plan's canonical-form payload (sorted keys, no insignificant whitespace, with `self_hash` field removed) equals the plan's declared `self_hash`.
 - [ ] **Plan canonical identity is bound** — diagnoses against two different fixture-canonicals produce plans with different `canonical_identity` blocks.
-- [ ] **All five pre-flight refusal predicates fire correctly** — running diagnose with (a) `pocketnet-core` running, (b) ahead-of-canonical local node, (c) version mismatch, (d) insufficient volume capacity, (e) read-only / permission-denied volume each refuses with a distinct exit code (per SC-006 + EC-011).
+- [ ] **All five environmental pre-flight refusal predicates fire correctly** — running diagnose with (a) `pocketnet-core` running, (b) ahead-of-canonical local node, (c) pocketnet-core-version mismatch, (d) insufficient volume capacity, (e) read-only / permission-denied volume each refuses with a distinct exit code from the 2..6 block (per SC-006 + EC-011).
+- [ ] **Manifest-format-version refusal fires** — diagnose against a manifest carrying an unrecognized future `format_version` refuses with exit code 7, no chunk-store fetches attempted (per CSC2-002).
 
 ### Gate 3 → 4: Apply Round-Trips Against Real Canonical
 
@@ -298,7 +308,7 @@ The doctor's read-only pathway plus foundational scaffolding both phases share:
 - **Plan-stage / FR-018 forward-compat surface.** The manifest schema declares a `format_version` field (current value 1) and a reserved `trust_anchors` block (empty in v1). Future canonicals can populate `trust_anchors` with chain-anchored verification fields, healthy-peer cross-check fields, or other trust evidence without breaking v1 parsers. v1 parsers ignore unknown contents of `trust_anchors` but parse and validate the field's presence. This is the testable surface for FR-018 (CSC2-002 covers the version-mismatch path).
 - **Clarify-stage / plan filename and location.** `plan.json` written alongside the operator's pocketdb-parent directory by default, overrideable with `--plan-out <path>`.
 - **Tasks-stage / pre-flight predicate ordering.** Predicates execute in order: running-node check → version-mismatch check → volume-capacity check → permission/read-only check → ahead-of-canonical check.
-- **Tasks-stage / exit-code allocation.** `0` success. `1` generic error. `2..6` the five refusal predicates (running-node 2, ahead-of-canonical 3, version mismatch 4, capacity 5, permission/read-only 6). `10..19` reserved for apply-time failures (Chunk 3 inherits and allocates: e.g., 10 rollback completed, 11 rollback failed, 12 network exhausted, 13 manifest-format-version unrecognized, others as Chunk 3 needs). Codes documented in `--help` output and the Chunk 5 troubleshooting guide.
+- **Tasks-stage / exit-code allocation.** `0` success. `1` generic error. `2..7` pre-flight refusals — code per condition, fired in either diagnose or apply (whichever encounters the condition first): running-node 2, ahead-of-canonical 3, pocketnet-core-version mismatch 4, capacity 5, permission/read-only 6, manifest-format-version unrecognized 7. `10..19` reserved for **mid-run** apply-time failures (conditions that surface after pre-flight passes; Chunk 3 inherits and allocates: 10 rollback completed, 11 rollback failed, 12 network retry budget exhausted, 13 reserved for future apply-time errors, 14 EC-005 superseded-canonical refusal, 15 plan tamper detected). The categorization rule: 2..7 pre-flight (refuse before mutating anything), 10..19 mid-run (refuse after pre-flight, may have staging artifacts to clean up). Codes documented in `--help` output and the Chunk 5 troubleshooting guide.
 
 ### What this chunk unblocks
 
@@ -369,7 +379,7 @@ The doctor's mutating pathway:
 - **Plan-stage / EC-005 superseded-canonical detection.** Apply re-fetches the manifest at start (using Chunk 2's verifier) and compares the served manifest hash against the plan's `canonical_identity.manifest_hash`. Mismatch → warn-and-offer-re-diagnose path; match → proceed with apply. The warn diagnostic names the served canonical's block height vs. the plan's pinned block height.
 - **Plan-stage / EC-002 partial-pocketdb plan contract.** Missing-file divergences in the plan are encoded as full-file entries with an explicit `expected_source: "fetch_full"` marker (or equivalent). Apply consumes them identically to whole-file divergences — the same fetch + stage + verify + rename path. Differs only in the absence of a pre-apply shadow (no original to shadow).
 - **Plan-stage / inherited HTTP client and SQLite library.** Chunk 3 uses the same HTTP client library and SQLite binding chosen by Chunk 2. No second library is introduced at this layer.
-- **Tasks-stage / apply-time exit codes.** Chunk 3 allocates codes from the 10..19 range reserved by Chunk 2: 10 rollback completed (verification failed, pre-apply state restored), 11 rollback failed (verification failed AND restoration failed — operator intervention needed), 12 network retry budget exhausted, 13 manifest-format-version unrecognized at apply time, 14 EC-005 superseded-canonical refusal, 15 plan tamper detected (EC-009). Documented in Chunk 5 troubleshooting guide.
+- **Tasks-stage / apply-time exit codes.** Chunk 3 allocates codes from the 10..19 range reserved by Chunk 2 for **mid-run** failures: 10 rollback completed (verification failed, pre-apply state restored), 11 rollback failed (verification failed AND restoration failed — operator intervention needed), 12 network retry budget exhausted, 13 reserved for future apply-time errors, 14 EC-005 superseded-canonical refusal (mid-run; pre-flight detects this only on diagnose where the plan does not yet exist), 15 plan tamper detected (EC-009). Manifest-format-version-unrecognized refusal uses code 7 (pre-flight block) regardless of phase per Chunk 2's categorization rule. Documented in Chunk 5 troubleshooting guide.
 
 ### What this chunk unblocks
 
@@ -417,8 +427,8 @@ None new. All ECs are owned by Chunks 2 or 3.
 ### Speckit Stop Resolutions
 
 - **Plan-stage / drill node provisioning.** Project-internal test node under virtual-machine-snapshot discipline. Pre-drill snapshot captured; post-drill snapshot is restored if the drill is re-run. Drill instrumentation (damage-injection script, observation of `getbestblockhash`) committed to `experiments/02-recovery-drill/` for reproducibility.
-- **Plan-stage / SC-008 256 MB drop semantics.** "Drops every 256 MB" is realized as: kill the active TCP connection (via `tc` egress policy combined with iptables `REJECT --reject-with tcp-reset` rules on the simulator host) once per 256 MB of cumulative bytes transferred to the doctor's HTTP client. The doctor's per-chunk retry-and-resume path (Chunk 3 FR-019, FR-020) is the unit under test. No in-binary instrumentation; the test exercises the real network code path.
-- **Plan-stage / network-drop simulation tooling.** Linux `tc` (Traffic Control) plus `iptables` on the drill host. Avoids in-binary instrumentation that would bypass the doctor's real network code path.
+- **Plan-stage / SC-008 256 MB drop semantics.** "Drops every 256 MB" is realized as: an `iptables` rule with `REJECT --reject-with tcp-reset` triggered once per 256 MB of cumulative bytes transferred to the doctor's HTTP client. The connection-kill primitive is iptables alone — the rule applies on the simulator host between the doctor's HTTP client and the chunk store, sending a TCP RST that the client observes as a connection reset. The doctor's per-chunk retry-and-resume path (Chunk 3 FR-019, FR-020) is the unit under test. No in-binary instrumentation; the test exercises the real network code path.
+- **Plan-stage / network-drop simulation tooling.** `iptables` on the drill host is the connection-kill primitive (per the SC-008 mapping above). `tc` (Linux Traffic Control) is **optional** for orthogonal rate-shaping (e.g., capping bandwidth at 10 Mbps to mimic a constrained operator link); `tc` is not part of the SC-008 verification path and is not required to pass Gate 4 → 5.
 - **Tasks-stage / drill canonical provenance.** The drill canonical is produced by Chunk 1's server-side workflow at a pinned block height. Re-running the drill against a different block height requires updating the drill instrumentation; this is intentional friction to preserve drill reproducibility.
 
 ### What this chunk unblocks
@@ -456,8 +466,8 @@ None.
 
 ### Behavioral criteria
 
-- Released binaries are reproducibly built from a tagged source revision.
-- Released binaries are signed by the project's publisher key.
+- Released binaries are built from a tagged source revision.
+- Released binaries are signed by the project's publisher key (Authenticode for Windows; GPG for Linux/macOS sha256sums).
 - The verification key is published on the canonical publisher's distribution channel and is documented in the troubleshooting guide.
 - Operators downloading v1 can verify the binary's signature against the published key using only standard platform tools (`gpg --verify` on Linux/macOS; `signtool verify` or PowerShell `Get-AuthenticodeSignature` on Windows).
 
@@ -470,8 +480,9 @@ None.
 ### Speckit Stop Resolutions
 
 - **Plan-stage / release artifact hosting.** Hosted on the project-pinned publisher's HTTPS endpoint, same channel as full-snapshot distribution. GitHub Releases mirrors the artifacts.
-- **Plan-stage / signing scheme.** Long-lived publisher key. Public component published in the project README and on the canonical publisher's distribution channel. Authenticode signature for Windows binaries; GPG-signed sha256sums file for Linux/macOS binaries (or platform-equivalent).
-- **Plan-stage / Windows code-signing path.** Authenticode signature using the project's existing publisher cert. Same key family as macOS/Linux GPG signing where possible (or a Windows-specific certificate of the same provenance). Tooling: Windows SDK `signtool.exe` invoked from CI on a Windows runner.
+- **Plan-stage / signing scheme.** Two distinct cryptographic systems administratively maintained by the same publisher: (a) **Authenticode (X.509)** for Windows binaries — required by the Windows trust model; uses an X.509 code-signing certificate. (b) **GPG (OpenPGP)** for Linux/macOS — signs a sha256sums file alongside the released binaries; uses an OpenPGP keypair. The two systems are independent; Authenticode and GPG cannot share a "key family" because the cryptographic primitives, certificate chains, and verification tools differ. Both verification keys (the X.509 cert chain and the GPG public key) are published on the canonical publisher's distribution channel and recorded in the project README with fingerprints.
+- **Plan-stage / Windows code-signing path.** Authenticode signature using the project's X.509 publisher code-signing certificate (CA-issued or self-signed-with-published-cert; choice is plan-stage). Tooling: Windows SDK `signtool.exe` invoked from CI on a Windows runner.
+- **Plan-stage / signing-key custody.** Both private keys (the X.509 code-signing private key and the GPG signing private key) are held in the CI provider's encrypted secret store. The build pipeline retrieves them at sign-time only and never persists them on a runner's disk after the signing step. Developer laptops never hold either private key in steady state. Hardware-token-based custody (e.g., a YubiKey under the project maintainer's physical control) is an upgrade path for a future release; v1 uses the CI secret store as the standard small-project practice.
 - **Plan-stage / Windows installer.** Out of v1: installer / MSI / store distribution. v1 ships a signed `.exe` for Windows that runs from `cmd` or PowerShell. Installer is a delt.7 follow-up.
 - **Plan-stage / build pipeline / CI.** Multi-platform build matrix (Linux x86_64, macOS arm64 + x86_64, Windows x86_64) on a CI runner that produces signed artifacts from a tagged source revision. Specific CI provider is a plan-stage decision; the constraint is "tagged → signed binaries → published artifacts" with no manual key handling on a developer laptop in steady state.
 - **Plan-stage / on-doctor self-update.** Out of v1. Operators download new versions from the publisher's channel manually.
