@@ -8,11 +8,12 @@ You are running `/speckit.superb.verify` for Chunk ${CHUNK_ID} (${CHUNK_NAME}).
 
 ## Task
 
-Run `/speckit.superb.verify`. This is the **completion gate** — no chunk may merge without it. It produces:
-1. Spec-coverage checklist: every FR + SC mapped to concrete test evidence
-2. Fresh full-suite test run (credential-loaded mode)
-3. Bare-shell I-4 boundary proof (credential-absence failures cite the expected denial path)
-4. Infrastructure health confirmation (if chunk touches store/tunnel/container)
+Run `/speckit.superb.verify`. This is the **completion gate** — no chunk may merge without it. It:
+1. Resolves the installed `verification-before-completion` skill (from `./.agents/skills/verification-before-completion/SKILL.md`, `~/.agents/skills/verification-before-completion/SKILL.md`, or the global path — including the Claude plugin cache at `~/.claude/plugins/cache/claude-plugins-official/superpowers/<version>/skills/verification-before-completion/SKILL.md`). If `.specify/extensions/superb/superb-config.template.yml` declares a hard-required path that does not yet exist on disk, treat the plugin-cache copy as a valid resolution and proceed; do NOT halt for the bridge-resolver path alone if the skill content is reachable via the global path.
+2. Produces a spec-coverage checklist: every FR + SC mapped to concrete test evidence.
+3. Runs a fresh full-suite test (credential-loaded mode).
+4. Performs the bare-shell I-4 boundary proof (credential-absence failures cite the expected denial path).
+5. Confirms infrastructure health (if the chunk touches a store/tunnel/container).
 
 ## Required evidence pair (038-ported)
 
