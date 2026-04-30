@@ -1,11 +1,17 @@
 ---
-version: 0.3.2
+version: 0.3.3
 status: draft
 created: 2026-04-29
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: ../../docs/pre-spec-build/process.md
 changelog:
+  - version: 0.3.3
+    date: 2026-04-30
+    summary: Patch — apply Stage 5 delta-audit findings against pre-spec write-back content (PSA-08-F01-D, CSA-10-F01-D)
+    changes:
+      - "PSA-08-F01-D closed: Design Principle 9 stripped of process-history reference; principle now states only the substantive commitment (signed binaries + published key + operator verification)"
+      - "CSA-10-F01-D partially closed: Design Principle 9 expanded to cover supported platforms and operator-facing reference documentation; release-engineering plumbing (distribution mirrors) explicitly remains out-of-pre-spec scope"
   - version: 0.3.2
     date: 2026-04-30
     summary: Patch — write-back from Stage 5 chunking audit (CSA-10-F01 release-signing scope; CSA-11-F07 canonical-form serialization rule)
@@ -102,7 +108,7 @@ These constrain every functional requirement and inform every plan-stage decisio
 6. **Trust derives from the chain, eventually.** v1 trusts a project-pinned canonical publisher (HTTPS + SHA-256 manifest). The Design Principle is that trust must over time be hardened against a bad-actor publisher impersonating the canonical mirror. Two known paths exist for that hardening: (a) cryptographic derivation of manifest hashes from on-chain pocketnet state, and (b) cross-checking a candidate canonical against the local pocketdb of a trusted healthy peer at a known pocketnet block height. v1 implements neither; the architecture must not foreclose either.
 7. **Pocketnet-only scope.** The tool inspects pocketnet artifacts. It does not perform disk diagnostics, filesystem repair, or OS health checks. Volume capacity is the only OS-level surface.
 8. **Bandwidth proportional to damage.** A node behind by a small interval pulls a small delta. A node with widespread corruption pulls a large delta. A node identical to canonical pulls zero bytes and exits cleanly.
-9. **Operator-verifiable release artifacts.** v1 doctor binaries are signed; the verification key is published on the canonical publisher's distribution channel. Operators can confirm a downloaded binary is the genuine artifact before running it. The signing scheme is part of v1 — the chunking-doc Stage-5 audit promoted release artifact verifiability from "release polish" to a first-class Design Principle.
+9. **Operator-verifiable release artifacts.** v1 doctor binaries are signed; the verification key is published on the canonical publisher's distribution channel. Operators can confirm a downloaded binary is the genuine artifact before running it using only standard platform tools. v1 releases cover Linux, macOS, and Windows. v1 ships with operator-facing reference documentation enumerating every doctor exit code, with a diagnostic message and an operator action per code.
 
 ---
 
