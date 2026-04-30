@@ -1,10 +1,15 @@
 ---
-version: 0.3.2
+version: 0.3.3
 status: draft
 created: 2026-02-23
-last_modified: 2026-04-26
+last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 changelog:
+  - version: 0.3.3
+    date: 2026-04-30
+    summary: Patch — codify three-digit zero-padded chunk ID convention as a Stage 4 Progress Tracker authoring rule
+    changes:
+      - "Stage 4 § Strategic Chunking: new authoring rule pins chunk IDs as three-digit zero-padded (`001`, `002`, …); chunk-scoped contract IDs (CR-prefix, CSC-prefix) inherit the same prefix. Promoted to a process-wide convention so the chunk-runner's feature-branch convention (`<spec-dir-basename>/chunk-<id>`) produces stable widths across projects with ≥10 chunks."
   - version: 0.3.2
     date: 2026-04-26
     summary: Three additions surfaced by the 058-1 auto-chunk-runner retrospective — Stage 7 Post-Implementation Reconciliation; runner pre-flight as a third propagation-defense; Progress Tracker column-order convention
@@ -370,6 +375,7 @@ Every Progress Tracker or checklist update is a patch-version bump with a change
 - **Column order:** `Chunk | Title | FRs | SCs | Status` — Status is the rightmost column. Pre-flight parsers treat the last cell of each row as the status field; any other ordering causes false launch refusal (the parser will read the SC list as a status).
 - **Status values:** capitalized `Pending` or `In Progress` for chunks awaiting a run; the runner writes `Implementation Complete — Awaiting Merge` on its post-implementation reconciliation pass.
 - **One row per chunk**, plus the header and separator rows. No merged cells, no nested tables.
+- **Chunk ID format:** three-digit zero-padded (`001`, `002`, …, `099`, `100`+ as needed). The chunk-runner uses the chunk ID literally to construct the feature branch name (`<spec-dir-basename>/chunk-<id>`); single-digit IDs would produce ambiguous branch ordering and inconsistent column widths if a project crosses ten chunks. Chunk-scoped contract IDs (e.g., `CR001-NNN` for Chunk 001's integration contracts, `CSC001-NNN` for Chunk 001's chunk-specific success criteria) inherit the same three-digit prefix.
 
 **Per-chunk `### Speckit Stop Resolutions` subsection.** For each chunk, an explicit subsection enumerates the speckit stops (from the inventory in [`audit-criteria.md`](audit-criteria.md)) whose resolution depends on chunk-specific intent, and carries the authorized answer for each. Stops resolvable from the pre-spec alone need not be repeated; stops that need chunk-level framing are answered here. This is the single home for chunk-level stop resolutions across every pipeline stage (clarify, plan, tasks); the chunk-runner's stage prompts consult it via their autonomous resolution ladders.
 
