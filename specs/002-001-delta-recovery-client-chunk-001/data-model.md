@@ -66,7 +66,7 @@ Element of the manifest's `entries` array. The entry's shape is selected by the 
 ### Validation rules (per-file entry)
 
 - `entry_kind` discriminates: schema uses `oneOf` keyed on `entry_kind`. Unknown values are schema-invalid.
-- `path` is non-empty, contains no `..` segments, no leading `/`, no Windows-style separators. ASCII-safe in v1; UTF-8 permitted but not exercised by current artifact paths.
+- `path` is non-empty, contains no `..` segments, no leading `/`, no Windows-style separators. v1 path components are restricted to `[A-Za-z0-9_.\-]` per the schema's `path` regex; UTF-8 multibyte components are not permitted in v1.
 - For `sqlite_pages`:
   - `pages` is non-empty (a zero-page file would be a `whole_file` entry).
   - Each page object: `offset` is a non-negative multiple of 4096; `hash` is 64-character lowercase hex.

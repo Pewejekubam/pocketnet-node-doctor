@@ -160,3 +160,10 @@ Each decision below is resolved per the order: pre-declared default (none in chu
 Constitution: still PASS (still vacuous — no principles ratified).
 Spec Clarifications: Q1 resolved by D2; Q5 resolved by D3. Q2, Q3, Q4 were closed in the spec itself.
 Plan-layer deferrals from spec: all five resolved (D1, D6, D7, D8, D9).
+
+## Known Coverage Gaps
+
+Two acknowledged-non-blocking partial coverages, recorded so they are visible during TDD and do not silently propagate:
+
+- **BC-003 (chunk store survives concurrent fetches at typical operator scale)** — covered structurally by tasks.md T049 (`CONTRACT-HANDOFF.md`) as an inheritance-from-existing-channel invariant rather than by harness load testing in this chunk. Justification: the chunking doc Speckit Stop pins hosting topology to "same channel as today's full-snapshot distribution," and per plan §D9 concrete capacity numbers are owned operationally by the sibling `pocketnet_create_checkpoint` repo (`delt.3`). No harness in this repo can exercise real production capacity. The adjacent contract guarantee (chunk URLs are discrete static GETs over an existing high-capacity channel) is the load-bearing invariant; numerical capacity verification is a `delt.3` deployment-time concern.
+- **CSC001-003 / US-6 (drill canonical exists)** — verified at the harness level by tasks.md T046–T048 against the synthetic fixture as a stand-in for the real drill canonical; the live-drill-canonical predicate runs at `delt.3` deployment time, not in this chunk's evidence bundle. Justification: a real drill canonical can only be published by `delt.3`, which is the sibling repo this contract serves. The harness predicate (`harness/verify-drill-canonical.sh`) is the testable contract this chunk owns; T047 (`fixtures/README.md`) documents the pinning procedure for `delt.3` to follow at deployment time.

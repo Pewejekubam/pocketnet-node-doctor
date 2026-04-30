@@ -64,7 +64,7 @@ echo "$COMPUTED"
 Notes:
 
 - `jq -cS` produces compact (no insignificant whitespace) sorted-key output. `tr -d '\n'` strips jq's trailing newline so the hashed bytes are exactly the canonical-form payload.
-- If the publisher serves the manifest already in canonical form, `sha256sum </tmp/manifest.json | awk '{print $1}'` would also match — but the re-serialize-then-hash recipe is mirror-agnostic.
+- If the publisher serves the manifest already in canonical form AND the served body carries no trailing newline (the canonical-form rule excludes insignificant whitespace, including a final `\n`), `sha256sum </tmp/manifest.json | awk '{print $1}'` would also match. Any intermediary that appends a newline (some shells, some HTTP tools) breaks this shortcut, so the re-serialize-then-hash recipe above is the mirror-agnostic predicate and is what the harness uses.
 
 Expected: `trust-root MATCH`.
 
