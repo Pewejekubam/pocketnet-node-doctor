@@ -169,17 +169,17 @@ The conforming manifest generator + chunk-store builder + trust-root publisher l
 
 ### RED tests for User Story 5
 
-- [ ] T041 [P] [US5] Author `harness/verify-freshness.sh` — extracts `canonical_identity.created_at`, parses as RFC 3339 UTC, computes days delta against `date -u +%s`, asserts ≤ 30; emits `freshness OK` or `freshness VIOLATION` (CR001-008, US-5 AS-1)
+- [X] T041 [P] [US5] Author `harness/verify-freshness.sh` — extracts `canonical_identity.created_at`, parses as RFC 3339 UTC, computes days delta against `date -u +%s`, asserts ≤ 30; emits `freshness OK` or `freshness VIOLATION` (CR001-008, US-5 AS-1)
 
 ### Negative-test fixture for User Story 5
 
-- [ ] T042 [P] [US5] Generate `fixtures/negative/manifest-stale.json` — a manifest variant whose `canonical_identity.created_at` is 60 days before today (used to confirm the harness catches violations)
+- [X] T042 [P] [US5] Generate `fixtures/negative/manifest-stale.json` — a manifest variant whose `canonical_identity.created_at` is 60 days before today (used to confirm the harness catches violations)
 
 ### GREEN verification for User Story 5
 
-- [ ] T043 [US5] Set the US1 fixture manifest's `created_at` to `(today − 7 days)` (UTC) and re-emit `manifest.json` + recompute `trust-root.sha256` (depends T018, T019)
-- [ ] T044 [US5] Execute `harness/verify-freshness.sh fixtures/canonical/served/manifest.json`; capture `freshness OK` log to `evidence/us5-freshness-pass.log`
-- [ ] T045 [US5] Execute `harness/verify-freshness.sh fixtures/negative/manifest-stale.json`; assert non-zero exit / `freshness VIOLATION`; capture rejection log to `evidence/us5-stale-rejection.log`
+- [X] T043 [US5] Set the US1 fixture manifest's `created_at` to `(today − 7 days)` (UTC) and re-emit `manifest.json` + recompute `trust-root.sha256` (depends T018, T019)
+- [X] T044 [US5] Execute `harness/verify-freshness.sh fixtures/canonical/served/manifest.json`; capture `freshness OK` log to `evidence/us5-freshness-pass.log`
+- [X] T045 [US5] Execute `harness/verify-freshness.sh fixtures/negative/manifest-stale.json`; assert non-zero exit / `freshness VIOLATION`; capture rejection log to `evidence/us5-stale-rejection.log`
 
 **Checkpoint**: CR001-008 verified — freshness predicate is exercisable and discriminates conforming vs. stale.
 
@@ -193,15 +193,15 @@ The conforming manifest generator + chunk-store builder + trust-root publisher l
 
 ### RED test for User Story 6
 
-- [ ] T046 [US6] Author `harness/verify-drill-canonical.sh` — accepts `<base>`, `<drill-height>`, `<expected-trust-root-hex>`; fetches `<base>/canonicals/<drill-height>/manifest.json` and `<base>/canonicals/<drill-height>/trust-root.sha256`, runs `verify-trust-root.sh` against them, and asserts the sidecar value equals `<expected-trust-root-hex>` (CSC001-003, US-6 AS-1)
+- [X] T046 [US6] Author `harness/verify-drill-canonical.sh` — accepts `<base>`, `<drill-height>`, `<expected-trust-root-hex>`; fetches `<base>/canonicals/<drill-height>/manifest.json` and `<base>/canonicals/<drill-height>/trust-root.sha256`, runs `verify-trust-root.sh` against them, and asserts the sidecar value equals `<expected-trust-root-hex>` (CSC001-003, US-6 AS-1)
 
 ### Implementation for User Story 6
 
-- [ ] T047 [US6] Author `fixtures/README.md` documenting (a) the drill-canonical pinning procedure for sibling `delt.3` (which canonical's trust-root the drill rig's doctor build will compile in), (b) how `harness/verify-drill-canonical.sh` is run against `delt.3`'s deployed canonical at gate-evaluation time
+- [X] T047 [US6] Author `fixtures/README.md` documenting (a) the drill-canonical pinning procedure for sibling `delt.3` (which canonical's trust-root the drill rig's doctor build will compile in), (b) how `harness/verify-drill-canonical.sh` is run against `delt.3`'s deployed canonical at gate-evaluation time
 
 ### GREEN verification for User Story 6
 
-- [ ] T048 [US6] Execute `harness/verify-drill-canonical.sh <stub-base-url> <fixture-block-height> <fixture-trust-root>` against the synthetic fixture as a stand-in for the real drill canonical; capture pass log to `evidence/us6-drill-canonical-stub-pass.log` (real-canonical verification is deferred to `delt.3` deployment)
+- [X] T048 [US6] Execute `harness/verify-drill-canonical.sh <stub-base-url> <fixture-block-height> <fixture-trust-root>` against the synthetic fixture as a stand-in for the real drill canonical; capture pass log to `evidence/us6-drill-canonical-stub-pass.log` (real-canonical verification is deferred to `delt.3` deployment)
 
 **Checkpoint**: CSC001-003 verified at the harness level; deferred concrete drill-canonical verification is documented as a `delt.3` action.
 
