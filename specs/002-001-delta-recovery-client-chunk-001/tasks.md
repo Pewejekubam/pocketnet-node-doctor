@@ -31,10 +31,10 @@ The conforming manifest generator + chunk-store builder + trust-root publisher l
 
 **Purpose**: Scaffold the directories and document tool prerequisites used by every later task.
 
-- [ ] T001 Create `specs/002-001-delta-recovery-client-chunk-001/fixtures/` with subdirectories `canonical/source/`, `canonical/served/`, `negative/`
-- [ ] T002 [P] Create `specs/002-001-delta-recovery-client-chunk-001/harness/` for verification scripts
-- [ ] T003 [P] Create `specs/002-001-delta-recovery-client-chunk-001/evidence/` for captured run logs and gate bundles
-- [ ] T004 [P] Author `specs/002-001-delta-recovery-client-chunk-001/harness/README.md` enumerating tool prerequisites (`curl`, `jq`, `sha256sum`, `zstd`, `gzip`, `check-jsonschema` or `ajv`, `python3` ≥ 3.10) and their pinned-or-tested versions
+- [X] T001 Create `specs/002-001-delta-recovery-client-chunk-001/fixtures/` with subdirectories `canonical/source/`, `canonical/served/`, `negative/`
+- [X] T002 [P] Create `specs/002-001-delta-recovery-client-chunk-001/harness/` for verification scripts
+- [X] T003 [P] Create `specs/002-001-delta-recovery-client-chunk-001/evidence/` for captured run logs and gate bundles
+- [X] T004 [P] Author `specs/002-001-delta-recovery-client-chunk-001/harness/README.md` enumerating tool prerequisites (`curl`, `jq`, `sha256sum`, `zstd`, `gzip`, `check-jsonschema` or `ajv`, `python3` ≥ 3.10) and their pinned-or-tested versions
 
 ---
 
