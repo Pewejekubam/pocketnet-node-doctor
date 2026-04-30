@@ -41,7 +41,13 @@ specs/002-001-delta-recovery-client-chunk-001/
 │   ├── chunk-url-grammar.md        # HTTPS chunk-URL grammar + path conventions
 │   ├── trust-root-format.md        # trust-root sidecar shape
 │   └── http-encoding.md            # Accept-Encoding / 406 contract
-└── checklists/                     # /speckit.checklist output (pre-existing)
+├── checklists/                     # /speckit.checklist output (pre-existing)
+├── fixtures/                       # /speckit.tasks output — synthetic reference canonical
+│   ├── canonical/source/           # raw byte sources for synthetic canonical
+│   ├── canonical/served/           # served manifest, trust-root sidecar, pre-compressed chunks
+│   └── negative/                   # negative-test variants (tampered, stale, schema-violating)
+├── harness/                        # /speckit.tasks output — verification scripts + stub server
+└── evidence/                       # /speckit.tasks output — captured run logs and gate bundles
 ```
 
 ### Source Code (repository root)
@@ -116,8 +122,8 @@ Each decision below is resolved per the order: pre-declared default (none in chu
 
 ### D12. Schema document — citation of canonical-form rule
 
-- **Option chosen**: schema document carries a top-level `$comment` field citing pre-spec Implementation Context (specifically the line "Canonical-form serialization (for hash inputs): sorted JSON keys, no insignificant whitespace, UTF-8") and naming the trust-root construction (SHA-256 of canonical-form payload of the manifest JSON, with `$schema` reference field excluded if added at publish time).
-- **Rationale**: CSC001-001(b) requires the schema to cite the canonical-form rule. `$comment` is the JSON-Schema-native field for non-validation prose. Excluding any `$schema` reference field from the canonical-form-hash input is necessary so the trust-root hash is invariant to JSON Schema versioning of the manifest tooling.
+- **Option chosen**: schema document carries a top-level `$comment` field citing pre-spec Implementation Context (specifically the line "Canonical-form serialization (for hash inputs): sorted JSON keys, no insignificant whitespace, UTF-8") and naming the trust-root construction (SHA-256 of canonical-form payload of the manifest JSON). The manifest instance carries no fields excluded from the canonical-form-hash input — the schema's `unevaluatedProperties: false` constraint at every nesting level forbids any field other than the four required top-level fields (`format_version`, `canonical_identity`, `entries`, `trust_anchors`), so a `$schema` reference field cannot legally appear in a manifest instance and the hash input is therefore exactly the byte-for-byte canonical-form serialization of the manifest as validated.
+- **Rationale**: CSC001-001(b) requires the schema to cite the canonical-form rule. `$comment` is the JSON-Schema-native field for non-validation prose. The `unevaluatedProperties: false` posture (chosen for forward-compatibility safety in D2 / D3) doubles as the mechanism that keeps the trust-root hash input deterministic — no schema-tooling field can sneak into the hashed bytes because no such field can be present in a valid instance.
 
 ## Non-goals
 
