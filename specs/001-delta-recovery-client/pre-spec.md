@@ -1,11 +1,17 @@
 ---
-version: 0.3.1
+version: 0.3.2
 status: draft
 created: 2026-04-29
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: ../../docs/pre-spec-build/process.md
 changelog:
+  - version: 0.3.2
+    date: 2026-04-30
+    summary: Patch — write-back from Stage 5 chunking audit (CSA-10-F01 release-signing scope; CSA-11-F07 canonical-form serialization rule)
+    changes:
+      - "Design Principle 9 added: operator-verifiable release artifacts — v1 ships signed binaries with a published verification key on the same channel as the canonical publisher's distribution"
+      - "Implementation Context > Technology defaults pins the canonical-form serialization rule (sorted JSON keys, no insignificant whitespace, UTF-8) used by both the manifest's trust-root hash and the plan's self-hash; both consumers inherit a single rule"
   - version: 0.3.1
     date: 2026-04-30
     summary: Patch — name the existing full-snapshot recovery path as still-supported in v1; preserve roadmap room for the doctor to subsume it post-v1
@@ -96,6 +102,7 @@ These constrain every functional requirement and inform every plan-stage decisio
 6. **Trust derives from the chain, eventually.** v1 trusts a project-pinned canonical publisher (HTTPS + SHA-256 manifest). The Design Principle is that trust must over time be hardened against a bad-actor publisher impersonating the canonical mirror. Two known paths exist for that hardening: (a) cryptographic derivation of manifest hashes from on-chain pocketnet state, and (b) cross-checking a candidate canonical against the local pocketdb of a trusted healthy peer at a known pocketnet block height. v1 implements neither; the architecture must not foreclose either.
 7. **Pocketnet-only scope.** The tool inspects pocketnet artifacts. It does not perform disk diagnostics, filesystem repair, or OS health checks. Volume capacity is the only OS-level surface.
 8. **Bandwidth proportional to damage.** A node behind by a small interval pulls a small delta. A node with widespread corruption pulls a large delta. A node identical to canonical pulls zero bytes and exits cleanly.
+9. **Operator-verifiable release artifacts.** v1 doctor binaries are signed; the verification key is published on the canonical publisher's distribution channel. Operators can confirm a downloaded binary is the genuine artifact before running it. The signing scheme is part of v1 — the chunking-doc Stage-5 audit promoted release artifact verifiability from "release polish" to a first-class Design Principle.
 
 ---
 
@@ -274,6 +281,7 @@ This section is construction material for `speckit.plan`, not requirements for `
 - **Chunk addressing for `main.sqlite3`:** 4 KB SQLite page boundary. Validated empirically; do not deviate without re-running the experiment.
 - **Chunk addressing for non-SQLite artifacts:** whole-file granularity (`blocks/`, `chainstate/`, `indexes/`, any other manifest-listed artifacts).
 - **Hash function:** SHA-256 across all artifacts (manifest entries, plan self-hash, post-apply verification, trust-root pin). Single algorithm reduces surface area.
+- **Canonical-form serialization (for hash inputs):** sorted JSON keys, no insignificant whitespace, UTF-8 encoding. Applied identically to the manifest's trust-root-hash input (server side) and the plan's self-hash input (client side). Both producers serialize using the same rule so the hashes are reproducible across implementations and the doctor's hash machinery is uniform.
 - **Transport:** HTTPS GET against the canonical chunk store. Range requests acceptable but per-page chunks are addressable as discrete URLs to keep server-side caching simple.
 - **Compression:** Zstandard preferred for chunk-store payloads; gzip supported as fallback. Doctor honors `Content-Encoding` advertised by the chunk store; if neither encoding matches, apply refuses with a diagnostic naming the unsupported encoding.
 - **Trust root:** v1 pins the project's canonical publisher (the project maintainer, hosting on the same channel as today's full-snapshot distribution). Mechanism is **pinned-hash compare**: a SHA-256 hash of the canonical manifest is compiled into the doctor binary; a fetched manifest is authenticated by computing its SHA-256 and comparing to the pinned constant. No public-key signature is verified in v1. Out of v1 scope: independent third-party canonical publishers, web-of-trust models, healthy-peer cross-check, chain-anchored manifest verification. In Design Principle scope: not foreclosing any of those (FR-018).
