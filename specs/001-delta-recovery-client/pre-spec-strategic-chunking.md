@@ -1,11 +1,19 @@
 ---
-version: 1.0.2
+version: 1.1.0
 status: approved
 created: 2026-04-30
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: pre-spec.md
 changelog:
+  - version: 1.1.0
+    date: 2026-04-30
+    summary: Minor — inherit pre-spec v1.1.0 pins (Go language, v1 development trust-root constant); One-Time Setup Checklist trust-root item now checked
+    changes:
+      - "Purpose: pre-spec source-of-truth reference bumped from v0.3.3 to v1.1.0 (current state)"
+      - "Chunk 002 Speckit Stop Resolutions: language-and-runtime stop now inherits the pre-spec pin (Go) instead of leaving Go/Rust/Zig to plan-stage; SQLite library binding stop tightened to 'a Go SQLite binding chosen at plan-stage from the Go ecosystem'"
+      - "Chunk 003 Speckit Stop Resolutions: inherited HTTP client + SQLite binding bullet now explicitly cites the pre-spec language pin (Go) so chunks 002 and 003 build against the same toolchain"
+      - "One-Time Setup Checklist: trust-root constant pin item is now checked — value pinned in pre-spec Implementation Context (a939828d… per chunk-001 fixture); re-pin scheduled for chunk 005 release per existing checklist note"
   - version: 1.0.2
     date: 2026-04-30
     summary: Patch — Chunk 001 merged to main; Progress Tracker row flipped to terminal state per process.md v0.3.4 post-merge convention
@@ -82,7 +90,7 @@ changelog:
 
 ## Purpose
 
-This document decomposes the implementation of `pocketnet-node-doctor` (specified by [`pre-spec.md`](pre-spec.md) v0.3.3) into five dependency-ordered implementation chunks. Each chunk is a self-contained, testable, debuggable unit fed independently to the speckit pipeline (`speckit.specify` → `speckit.implement`). The chunking thesis is that bounded chunks produce bounded, mergeable implementations.
+This document decomposes the implementation of `pocketnet-node-doctor` (specified by [`pre-spec.md`](pre-spec.md) v1.1.0) into five dependency-ordered implementation chunks. Each chunk is a self-contained, testable, debuggable unit fed independently to the speckit pipeline (`speckit.specify` → `speckit.implement`). The chunking thesis is that bounded chunks produce bounded, mergeable implementations.
 
 The pre-spec is the source of truth. This document is derived from it and must remain consistent with it.
 
@@ -143,7 +151,7 @@ Pre-implementation prerequisites. None of these are implementation chunks; they 
 - [ ] **March → April chunk store materialization** to validate compressed delta size against the projected ~13–15 GB target (delt.2).
 - [ ] **Worst-case bracket reuse rate measured (Feb → April)** to confirm the design holds across longer-than-30-day intervals; expected reuse rate floor ≥ 50% (delt.5).
 - [ ] **Project test rig matches SC-001 reference rig** (8 vCPU x86_64 host, NVMe-class disk, 16 GB RAM) or alternative reference is documented and SC-001 is amended.
-- [ ] **Trust-root constant value is published and pinned in build configuration** for Chunks 002 and 003 development. Re-pin only when Chunk 005 chooses the v1 release canonical. Chunks 002 and 003 must build against the same pinned value to avoid integration-time drift.
+- [x] **Trust-root constant value is published and pinned in build configuration** for Chunks 002 and 003 development. Pinned in pre-spec v1.1.0 Implementation Context: `a939828d349bc5259d2c79fe9251d4e3497d2d1518c944dfc91ae9594f029249` (chunk-001 fixture canonical at block height 3,806,626). Re-pin to a `delt.3`-published live canonical at chunk 005 release. Chunks 002 and 003 must build against the same pinned value to avoid integration-time drift.
 - [ ] **Project-internal test node** stopped, snapshotted (virtual-machine snapshot), and confirmed dead-state reproducible before Chunk 004 drill commences.
 
 ---
@@ -157,7 +165,7 @@ Each gate is a concrete, verifiable predicate that must hold before the next chu
 After One-Time Setup completes, before Chunk 001 begins.
 
 - [ ] **All measurement experiments closed** (delt.1, delt.2, delt.5) with results matching pre-spec projections (≥ 50% reuse worst-case; ~13–15 GB compressed delta).
-- [ ] **Trust-root constant pinned** for Chunks 002 and 003 development.
+- [x] **Trust-root constant pinned** for Chunks 002 and 003 development (`a939828d…` per pre-spec Implementation Context).
 
 ### Gate 001-Schema → 002: Manifest schema frozen
 
@@ -324,10 +332,10 @@ The doctor's read-only pathway plus foundational scaffolding both phases share:
 
 ### Speckit Stop Resolutions
 
-- **Plan-stage / language and runtime.** Single static binary, three platforms (Linux, macOS, Windows), no runtime dependencies. Specific language (Go, Rust, Zig) is a plan-stage decision under that constraint.
+- **Plan-stage / language and runtime.** Inherits the pre-spec Implementation Context pin: **Go**, single static binary across Linux, macOS, and Windows, no runtime dependencies.
 - **Plan-stage / CLI surface (`--full` mode preservation).** Subcommands (`diagnose`, `apply`); reserves namespace for a future `apply --full` subsumption mode per pre-spec Stage 4 hand-off note. No subcommand-collapsed-into-flags structure.
-- **Plan-stage / HTTP client library.** Language-default standard library client (Go `net/http`, Rust standard `hyper` / `reqwest`, Zig standard library, equivalent for whatever language is chosen). No bespoke HTTP framework. Connection re-use is enabled at the worker-pool level when Chunk 003 implements parallel chunk fetches; same library inherits to Chunk 003.
-- **Plan-stage / SQLite library bindings.** A single SQLite library binding for the chosen language (e.g., Go `mattn/go-sqlite3` or `modernc.org/sqlite`, Rust `rusqlite`, equivalent). The library is used by Chunk 002 for the post-apply `integrity_check` (Chunk 003 inherits) and by Chunk 002's `change_counter` ahead-of-canonical check via direct file-header parsing where possible. Same binding inherits to Chunk 003 to avoid linking two SQLite engines.
+- **Plan-stage / HTTP client library.** Go's standard-library `net/http` client (per pre-spec Implementation Context language pin). No bespoke HTTP framework. Connection re-use is enabled at the worker-pool level when Chunk 003 implements parallel chunk fetches; same library inherits to Chunk 003.
+- **Plan-stage / SQLite library bindings.** A single Go SQLite binding chosen at plan-stage from the Go ecosystem (e.g., `mattn/go-sqlite3` or `modernc.org/sqlite` — choice is plan-stage). The binding is used by Chunk 002 for the `change_counter` ahead-of-canonical check (where possible via direct file-header parsing without invoking the engine) and by Chunk 003 for the post-apply `integrity_check`. Same binding inherits to Chunk 003 to avoid linking two SQLite engines into one binary.
 - **Plan-stage / logging surface.** Plain-text to stderr at info level by default; `--verbose` flag enables debug. No structured logging in v1; no log-file output. Diagnose progress reporting (next bullet) reuses the same stderr surface.
 - **Plan-stage / progress reporting on long diagnose runs.** Diagnose emits progress to stderr at file-class boundaries (`main.sqlite3` page hashing milestones, `blocks/` file-by-file, etc.) so operators see liveness on long runs. Format is human-readable; not a structured machine protocol.
 - **Plan-stage / configuration storage.** No user-config file in v1. Behavior controlled by CLI flags only. Trust-root compiled in.
@@ -404,7 +412,7 @@ The doctor's mutating pathway:
 - **Plan-stage / Content-Encoding negotiation.** Apply's HTTP client sends `Accept-Encoding: zstd, gzip`. Server returns the preferred encoding per Chunk 001's HTTP-406-on-no-match contract; client decompresses transparently before hashing. Hash is over the uncompressed payload.
 - **Plan-stage / EC-005 superseded-canonical detection.** Apply re-fetches the manifest at start (using Chunk 002's verifier) and compares the served manifest hash against the plan's `canonical_identity.manifest_hash`. Mismatch → warn-and-offer-re-diagnose path; match → proceed with apply. The warn diagnostic names the served canonical's block height vs. the plan's pinned block height.
 - **Plan-stage / EC-002 partial-pocketdb plan contract.** Missing-file divergences in the plan are encoded as full-file entries with an explicit `expected_source: "fetch_full"` marker (or equivalent). Apply consumes them identically to whole-file divergences — the same fetch + stage + verify + rename path. Differs only in the absence of a pre-apply shadow (no original to shadow).
-- **Plan-stage / inherited HTTP client and SQLite library.** Chunk 003 uses the same HTTP client library and SQLite binding chosen by Chunk 002. No second library is introduced at this layer.
+- **Plan-stage / inherited language, HTTP client, and SQLite library.** Chunk 003 inherits the Go language pin from pre-spec Implementation Context (same toolchain Chunk 002 builds against). HTTP client is `net/http`; SQLite binding is the same one Chunk 002 chose. No second language, HTTP framework, or SQLite engine is introduced at this layer.
 - **Tasks-stage / apply-time exit codes.** Chunk 003 allocates codes from the 10..19 range reserved by Chunk 002 for **mid-run** failures: 10 rollback completed (verification failed, pre-apply state restored), 11 rollback failed (verification failed AND restoration failed — operator intervention needed), 12 network retry budget exhausted, 13 reserved for future apply-time errors, 14 EC-005 superseded-canonical refusal (mid-run; pre-flight detects this only on diagnose where the plan does not yet exist), 15 plan tamper detected (EC-009). Manifest-format-version-unrecognized refusal uses code 7 (pre-flight block) regardless of phase per Chunk 002's categorization rule. Documented in Chunk 005 troubleshooting guide.
 
 ### What this chunk unblocks

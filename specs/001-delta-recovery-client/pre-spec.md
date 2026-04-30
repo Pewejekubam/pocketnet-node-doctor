@@ -1,11 +1,17 @@
 ---
-version: 1.0.0
+version: 1.1.0
 status: approved
 created: 2026-04-29
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: ../../docs/pre-spec-build/process.md
 changelog:
+  - version: 1.1.0
+    date: 2026-04-30
+    summary: Minor — pin implementation language (Go) and v1 development trust-root constant in Implementation Context, removing two plan-stage decision surfaces from chunks 002 + 003
+    changes:
+      - "Implementation Context > Technology defaults: new bullet pinning the implementation language as Go (single static binary across Linux/macOS/Windows). Closes the Go/Rust/Zig latitude that chunk 002 + 003 would otherwise have resolved at plan-stage with a chance of cross-chunk drift."
+      - "Implementation Context > Technology defaults: new bullet pinning the v1 development trust-root constant (a939828d… from the synthetic chunk-001 fixture canonical at block height 3,806,626). Chunks 002 and 003 build against this constant. Re-pin to a delt.3-published live canonical at chunk 005 release per the existing One-Time Setup Checklist."
   - version: 1.0.0
     date: 2026-04-30
     summary: Approval milestone — Stage 6 formally exited; ready to drive implementation via chunk-runner
@@ -292,6 +298,8 @@ This section is construction material for `speckit.plan`, not requirements for `
 
 - **Chunk addressing for `main.sqlite3`:** 4 KB SQLite page boundary. Validated empirically; do not deviate without re-running the experiment.
 - **Chunk addressing for non-SQLite artifacts:** whole-file granularity (`blocks/`, `chainstate/`, `indexes/`, any other manifest-listed artifacts).
+- **Implementation language:** Go. Produces a single static binary across Linux, macOS, and Windows with no runtime dependencies. Standard-library HTTP client (`net/http`) for chunk-store fetches; a stable Go SQLite binding (specific binding chosen at plan-stage from the Go ecosystem) for `main.sqlite3` access. All client-side chunks build against the same language and binding pin to avoid linking two SQLite engines into one binary.
+- **v1 development trust-root constant:** `a939828d349bc5259d2c79fe9251d4e3497d2d1518c944dfc91ae9594f029249`. Sourced from the synthetic chunk-001 fixture canonical at block height 3,806,626. Compiled into chunk 002 and chunk 003 development builds. Re-pinned to a `delt.3`-published live canonical at chunk 005 release; the re-pin event is a One-Time Setup Checklist item the chunking doc tracks.
 - **Hash function:** SHA-256 across all artifacts (manifest entries, plan self-hash, post-apply verification, trust-root pin). Single algorithm reduces surface area.
 - **Canonical-form serialization (for hash inputs):** sorted JSON keys, no insignificant whitespace, UTF-8 encoding. Applied identically to the manifest's trust-root-hash input (server side) and the plan's self-hash input (client side). Both producers serialize using the same rule so the hashes are reproducible across implementations and the doctor's hash machinery is uniform.
 - **Transport:** HTTPS GET against the canonical chunk store. Range requests acceptable but per-page chunks are addressable as discrete URLs to keep server-side caching simple.
