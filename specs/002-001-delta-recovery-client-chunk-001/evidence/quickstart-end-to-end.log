@@ -1,0 +1,33 @@
+=== quickstart Step 1 — schema validation ===
+ok -- validation done
+schema OK
+1
+{
+  "block_height": 3806626,
+  "created_at": "2026-04-23T15:20:31Z",
+  "pocketnet_core_version": "0.21.18-fixture"
+}
+3
+[]
+
+=== quickstart Step 2 — trust-root verification ===
+trust-root MATCH
+
+=== quickstart Step 3 — sampled chunks (page, blocks, chainstate) ===
+  OK page0 hash MATCH (a5da813859d0c890114890b3126c728786362bea0dfb507235c95a76cfe96e72)
+  OK block hash MATCH (74d199393f491bb42a326cfc7a6d1da1f2905aee258cc32b16bb996b80a8d4b7)
+  OK chainstate hash MATCH (4206ac642ad8ee1bfbb0f3b448c17f4b7d4a692cad06f8ed7ce4d8b7f31f6e30)
+sampled chunks MATCH (page=a5da813859d0c890114890b3126c728786362bea0dfb507235c95a76cfe96e72 block=74d199393f491bb42a326cfc7a6d1da1f2905aee258cc32b16bb996b80a8d4b7 chainstate=4206ac642ad8ee1bfbb0f3b448c17f4b7d4a692cad06f8ed7ce4d8b7f31f6e30)
+
+=== quickstart Step 4 — Accept-Encoding contract ===
+accept-encoding-zstd OK (a5da813859d0c890114890b3126c728786362bea0dfb507235c95a76cfe96e72)
+accept-encoding-gzip OK (a5da813859d0c890114890b3126c728786362bea0dfb507235c95a76cfe96e72)
+accept-encoding-406 OK (32 body bytes; both 'zstd' and 'gzip' present)
+
+=== quickstart Step 5 — freshness ===
+freshness OK (7 days since 2026-04-23T15:20:31Z; threshold = 30)
+
+=== quickstart Step 6 — change_counter on main.sqlite3 ===
+change_counter OK (main.sqlite3=314159; no other sqlite_pages entry carries change_counter)
+
+=== quickstart end-to-end PASS (height=3806626) ===
