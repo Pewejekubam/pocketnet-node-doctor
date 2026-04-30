@@ -74,3 +74,6 @@ build/
 
 # Experiment evidence logs are tracked (community verification of empirical claims)
 !experiments/**/*.log
+
+# Spec-kit chunk evidence logs are tracked (gate-bundle inputs; load-bearing artifacts)
+!specs/**/evidence/*.log

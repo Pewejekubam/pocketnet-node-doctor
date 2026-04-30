@@ -1,0 +1,10 @@
+=== T006: Schema $comment field cites canonical-form rule + trust-root construction ===
+--- Extract $comment from contracts/manifest.schema.json ---
+Canonical-form serialization rule (per pocketnet-node-doctor pre-spec Implementation Context): sorted JSON keys at every nesting level, no insignificant whitespace (no spaces between tokens, no trailing newline inside the serialized payload), UTF-8 byte output. The trust-root constant for a canonical is SHA-256(canonical_form_serialize(this manifest)) — externally published as the sidecar file 'trust-root.sha256' next to 'manifest.json'. The trust-root is NOT carried inside the manifest. Both the server-side manifest generator and the doctor-side plan-format library MUST serialize using this rule so the hashes are reproducible across implementations.
+--- Required substring checks ---
+OK: $comment contains 'sorted JSON keys'
+OK: $comment contains 'no insignificant whitespace'
+OK: $comment contains 'UTF-8'
+OK: $comment contains 'trust-root'
+OK: $comment contains 'SHA-256'
+OK: $comment contains 'canonical_form_serialize'

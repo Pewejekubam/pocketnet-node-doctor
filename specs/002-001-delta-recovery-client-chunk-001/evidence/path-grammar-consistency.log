@@ -1,0 +1,20 @@
+=== T009: chunk-url-grammar.md path-segment grammar consistent with manifest schema's path regex ===
+--- Schema path regex (sqlite_pages_entry) ---
+^(?!/)(?!.*\.\.)([A-Za-z0-9_.\-]+)(/[A-Za-z0-9_.\-]+)*$
+--- Schema path regex (whole_file_entry) ---
+^(?!/)(?!.*\.\.)([A-Za-z0-9_.\-]+)(/[A-Za-z0-9_.\-]+)*$
+--- Cross-check: same pattern on both entry kinds? ---
+OK: identical path regex on both entry shapes
+--- chunk-url-grammar.md prohibitions and component-character grammar ---
+47:- `<path>` is the manifest entry's `path` value verbatim, with each path component URL-encoded per RFC 3986 §2 (forward slashes between components are NOT encoded). The schema's path pattern restricts components to `[A-Za-z0-9_.-]`, so URL-encoding is normally a no-op.
+75:- **No URL-encoded segment traversal.** The schema's `path` pattern rejects `..` segments; the grammar inherits that restriction. URLs constructed under this grammar refer only to under-canonical-prefix paths.
+--- Negative samples: rejected by schema regex? ---
+OK: schema regex rejects '/blocks/000.dat'
+OK: schema regex rejects 'blocks/../etc/passwd'
+OK: schema regex rejects 'blocks/foo bar'
+OK: schema regex rejects 'blocks/foo%2F'
+OK: schema regex accepts 'pocketdb/main.sqlite3'
+OK: schema regex accepts 'blocks/000123.dat'
+OK: schema regex accepts 'chainstate/CURRENT'
+OK: schema regex accepts 'a.b-c_d/x.y'
+PASS

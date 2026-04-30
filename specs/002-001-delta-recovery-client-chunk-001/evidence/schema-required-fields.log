@@ -1,0 +1,13 @@
+=== T007: Schema declares format_version, canonical_identity, entries, trust_anchors as required at top level ===
+--- Extracted .required ---
+[
+  "format_version",
+  "canonical_identity",
+  "entries",
+  "trust_anchors"
+]
+--- Required-field membership checks ---
+OK: top-level required includes 'format_version'
+OK: top-level required includes 'canonical_identity'
+OK: top-level required includes 'entries'
+OK: top-level required includes 'trust_anchors'

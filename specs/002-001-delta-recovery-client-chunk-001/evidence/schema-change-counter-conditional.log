@@ -1,0 +1,30 @@
+=== T008: Schema enforces change_counter <-> pocketdb/main.sqlite3 conditional via allOf if/then/else ===
+--- Extracted sqlite_pages_entry.allOf ---
+[
+  {
+    "if": {
+      "properties": {
+        "path": {
+          "const": "pocketdb/main.sqlite3"
+        }
+      },
+      "required": [
+        "path"
+      ]
+    },
+    "then": {
+      "required": [
+        "change_counter"
+      ]
+    },
+    "else": {
+      "not": {
+        "required": [
+          "change_counter"
+        ]
+      }
+    }
+  }
+]
+--- Conditional shape check ---
+OK: if/then/else gates change_counter on pocketdb/main.sqlite3
