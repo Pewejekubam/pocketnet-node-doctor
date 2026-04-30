@@ -1,11 +1,17 @@
 ---
-version: 0.3.0
+version: 0.3.1
 status: draft
 created: 2026-04-29
 last_modified: 2026-04-30
 authors: [david, claude]
 related: ../../docs/pre-spec-build/process.md
 changelog:
+  - version: 0.3.1
+    date: 2026-04-30
+    summary: Patch — name the existing full-snapshot recovery path as still-supported in v1; preserve roadmap room for the doctor to subsume it post-v1
+    changes:
+      - "Vision: name `pocketnet_recover_checkpoint` as the still-supported full-snapshot path; the doctor is the delta-mode alternative in v1, not a replacement"
+      - "Stage 4 hand-off notes: doctor CLI surface must not foreclose a future `--full` mode that subsumes the full-checkpoint download path"
   - version: 0.3.0
     date: 2026-04-30
     summary: Stage 3 refinement — apply all Stage 2 audit findings (pre-spec-audit.md v0.1.0)
@@ -69,6 +75,8 @@ The feature ships as two operator-invoked modes — **diagnose** (read-only heal
 ## Vision
 
 A pocketnet operator with a node that won't start runs `pocketnet-node-doctor diagnose`, gets a plan in seconds, runs `pocketnet-node-doctor apply`, and is back online within one or two hours of wire time instead of overnight. The operator does not learn SQLite internals. The operator does not edit a config file. The operator does not need to coordinate with a publisher. The tool's contract is that any deviation from the canonical bytes — drift, corruption, partial write, bit rot — is treated identically: the operator's local bytes must match canonical bitwise after a successful apply, or the run rolls back and the local node is left in its pre-apply state.
+
+The doctor is the **delta-mode alternative** in v1, not a replacement: the existing full-snapshot recovery path (`pocketnet_recover_checkpoint`) remains operationally supported for operators who prefer it, lack a partial pocketdb to delta against, or need to recover a never-synced node. Unifying both paths under a single doctor CLI (e.g., a `--full` mode that subsumes full-checkpoint download alongside the v1 delta mode) is on the roadmap, not in v1 scope.
 
 ## Fire-and-Forget Execution: Intent Is Pre-Ratified
 
@@ -305,6 +313,7 @@ This section is construction material for `speckit.plan`, not requirements for `
 Items the chunking document is expected to resolve at chunk granularity (carried forward from Stage 3 audit application):
 
 - **Drill chunk's canonical source.** US-005's end-to-end recovery drill depends on a published canonical at a known block height. The drill chunk's `### Speckit Stop Resolutions` should declare whether the drill canonical is (a) a project-published canonical at a pinned block height, (b) a private fixture generated for the test, or (c) an artifact produced by the server-side `pocketnet_create_checkpoint` extension. (PSA-11-F06.)
+- **CLI surface preserves room for `--full` mode.** The v1 doctor is delta-only, but the binary's CLI surface (subcommand structure, flag parsing, exit-code allocation) must not foreclose a future mode that subsumes full-checkpoint download. The chunking-doc chunk that authors the apply CLI should declare this as a Speckit Stop Resolution so plan-stage doesn't lock the surface to delta-only.
 
 ---
 
