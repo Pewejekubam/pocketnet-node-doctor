@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "manifest.schema.v1.json",
+  "title": "Pocketnet Node Doctor — Canonical Manifest (v1)",
+  "description": "Schema for the per-canonical manifest published by the pocketnet_create_checkpoint workflow. Conforming manifests are consumed by the pocketnet-node-doctor binary to authenticate canonicals (via the trust-root sidecar) and to fetch only differing chunks from the chunk store. format_version 1.",
+  "$comment": "Canonical-form serialization rule (per pocketnet-node-doctor pre-spec Implementation Context): sorted JSON keys at every nesting level, no insignificant whitespace (no spaces between tokens, no trailing newline inside the serialized payload), UTF-8 byte output. The trust-root constant for a canonical is SHA-256(canonical_form_serialize(this manifest)) — externally published as the sidecar file 'trust-root.sha256' next to 'manifest.json'. The trust-root is NOT carried inside the manifest. Both the server-side manifest generator and the doctor-side plan-format library MUST serialize using this rule so the hashes are reproducible across implementations.",
+  "type": "object",
+  "required": ["format_version", "canonical_identity", "entries", "trust_anchors"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "format_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Schema format version. v1 of the manifest fixes this to integer 1. Future schema-incompatible changes increment this value."
+    },
+    "canonical_identity": {
+      "type": "object",
+      "required": ["block_height", "pocketnet_core_version", "created_at"],
+      "unevaluatedProperties": false,
+      "properties": {
+        "block_height": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Pocketnet block height the canonical was minted at."
+        },
+        "pocketnet_core_version": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Exact pocketnet-core version string the canonical was built against. The doctor refuses on local mismatch (FR-012)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC 3339 / ISO-8601 timestamp in UTC. Used for the 30-day publication-freshness check (CR001-008)."
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Per-file entries enumerating the canonical artifact set. Each element is one of two shapes selected by the entry_kind discriminator: 'sqlite_pages' for page-level (4 KB) addressing of SQLite-shaped artifacts, 'whole_file' for whole-file SHA-256 of non-SQLite artifacts.",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/sqlite_pages_entry" },
+          { "$ref": "#/$defs/whole_file_entry" }
+        ]
+      }
+    },
+    "trust_anchors": {
+      "type": "array",
+      "description": "Reserved for v1.x+ trust anchors (third-party publishers, healthy-peer cross-check anchors, chain-anchored verification — see pre-spec FR-018). v1 publishes the empty array [].",
+      "maxItems": 0,
+      "items": false
+    }
+  },
+  "$defs": {
+    "sqlite_pages_entry": {
+      "type": "object",
+      "required": ["entry_kind", "path", "pages"],
+      "unevaluatedProperties": false,
+      "properties": {
+        "entry_kind": {
+          "const": "sqlite_pages",
+          "description": "Discriminator. Selects the page-level entry shape."
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*\\.\\.)([A-Za-z0-9_.\\-]+)(/[A-Za-z0-9_.\\-]+)*$",
+          "description": "Forward-slash relative path rooted at the pocketnet data directory (e.g., 'pocketdb/main.sqlite3'). No leading slash, no '..' segments, ASCII-safe component names."
+        },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Total page coverage of the canonical's file at the 4 KB SQLite page boundary. Sorted by offset ascending; offsets are contiguous multiples of 4096 covering the entire file.",
+          "items": {
+            "type": "object",
+            "required": ["offset", "hash"],
+            "unevaluatedProperties": false,
+            "properties": {
+              "offset": {
+                "type": "integer",
+                "minimum": 0,
+                "multipleOf": 4096,
+                "description": "Byte offset of the page in the canonical file. Must be a non-negative multiple of 4096."
+              },
+              "hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$",
+                "description": "SHA-256 of the page's uncompressed bytes, lowercase hex, no prefix."
+              }
+            }
+          }
+        },
+        "change_counter": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "SQLite header change_counter value of the canonical's main.sqlite3. PERMITTED ONLY on the entry whose path is exactly 'pocketdb/main.sqlite3' — see allOf constraint below. Doctor's pre-flight ahead-of-canonical reference (pre-spec FR-011)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "path": { "const": "pocketdb/main.sqlite3" } },
+            "required": ["path"]
+          },
+          "then": { "required": ["change_counter"] },
+          "else": { "not": { "required": ["change_counter"] } }
+        }
+      ]
+    },
+    "whole_file_entry": {
+      "type": "object",
+      "required": ["entry_kind", "path", "hash"],
+      "unevaluatedProperties": false,
+      "properties": {
+        "entry_kind": {
+          "const": "whole_file",
+          "description": "Discriminator. Selects the whole-file entry shape."
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*\\.\\.)([A-Za-z0-9_.\\-]+)(/[A-Za-z0-9_.\\-]+)*$",
+          "description": "Forward-slash relative path rooted at the pocketnet data directory (e.g., 'blocks/000123.dat'). No leading slash, no '..' segments."
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the file's uncompressed bytes, lowercase hex, no prefix."
+        }
+      }
+    }
+  }
+}
