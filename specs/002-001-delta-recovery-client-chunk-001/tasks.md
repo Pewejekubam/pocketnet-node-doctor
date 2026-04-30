@@ -99,17 +99,17 @@ The conforming manifest generator + chunk-store builder + trust-root publisher l
 
 ### RED tests for User Story 2
 
-- [ ] T025 [P] [US2] Author `harness/verify-determinism.sh` — re-serializes `<manifest>` twice (independent jq invocations, fresh workdirs, optionally different working users) and asserts identical SHA-256 over canonical-form bytes (BC-002, US-2 AS-1)
-- [ ] T026 [P] [US2] Author `harness/verify-tamper-rejection.sh` — produces a tampered copy of `<manifest>` (single-byte mutation in a value field), re-hashes, and asserts the hash differs from `<sidecar>` (BC-001, US-2 AS-2)
+- [X] T025 [P] [US2] Author `harness/verify-determinism.sh` — re-serializes `<manifest>` twice (independent jq invocations, fresh workdirs, optionally different working users) and asserts identical SHA-256 over canonical-form bytes (BC-002, US-2 AS-1)
+- [X] T026 [P] [US2] Author `harness/verify-tamper-rejection.sh` — produces a tampered copy of `<manifest>` (single-byte mutation in a value field), re-hashes, and asserts the hash differs from `<sidecar>` (BC-001, US-2 AS-2)
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Generate `fixtures/negative/manifest-tampered.json` — copy of the US1 fixture manifest with a single value-field byte flipped, used by T026 (depends T018)
+- [X] T027 [US2] Generate `fixtures/negative/manifest-tampered.json` — copy of the US1 fixture manifest with a single value-field byte flipped, used by T026 (depends T018)
 
 ### GREEN verification for User Story 2
 
-- [ ] T028 [US2] Execute `harness/verify-determinism.sh fixtures/canonical/served/manifest.json`; capture pass log to `evidence/us2-determinism-pass.log`
-- [ ] T029 [US2] Execute `harness/verify-tamper-rejection.sh fixtures/canonical/served/manifest.json fixtures/canonical/served/trust-root.sha256 fixtures/negative/manifest-tampered.json`; capture pass log to `evidence/us2-tamper-rejection-pass.log`
+- [X] T028 [US2] Execute `harness/verify-determinism.sh fixtures/canonical/served/manifest.json`; capture pass log to `evidence/us2-determinism-pass.log`
+- [X] T029 [US2] Execute `harness/verify-tamper-rejection.sh fixtures/canonical/served/manifest.json fixtures/canonical/served/trust-root.sha256 fixtures/negative/manifest-tampered.json`; capture pass log to `evidence/us2-tamper-rejection-pass.log`
 
 **Checkpoint**: BC-001 and BC-002 verified against the fixture.
 
