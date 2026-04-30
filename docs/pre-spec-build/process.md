@@ -3,7 +3,7 @@ version: 0.3.2
 status: draft
 created: 2026-02-23
 last_modified: 2026-04-26
-authors: [david, claude]
+authors: [pewejekubam, claude]
 changelog:
   - version: 0.3.2
     date: 2026-04-26

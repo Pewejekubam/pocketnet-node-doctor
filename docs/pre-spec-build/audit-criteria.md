@@ -3,7 +3,7 @@ version: 0.2.0
 status: draft
 created: 2026-02-23
 last_modified: 2026-04-24
-authors: [david, claude]
+authors: [pewejekubam, claude]
 related: process.md
 changelog:
   - version: 0.2.0

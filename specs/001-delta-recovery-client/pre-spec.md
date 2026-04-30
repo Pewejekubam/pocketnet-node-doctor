@@ -3,7 +3,7 @@ version: 0.3.1
 status: draft
 created: 2026-04-29
 last_modified: 2026-04-30
-authors: [david, claude]
+authors: [pewejekubam, claude]
 related: ../../docs/pre-spec-build/process.md
 changelog:
   - version: 0.3.1
