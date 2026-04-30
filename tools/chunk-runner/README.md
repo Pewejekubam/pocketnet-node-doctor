@@ -178,6 +178,32 @@ tools/chunk-runner/test/test_arg_parsing.sh
 tools/chunk-runner/test/test_source_guard.sh
 ```
 
+## Optional: privacy pre-push hook
+
+For projects that publish to a public mirror alongside a private origin, `hooks/pre-push.example` is a project-agnostic git pre-push hook that scans outgoing commits for internal-leakage patterns (internal hostnames, server-side absolute paths, internal usernames, etc.) and refuses pushes that match.
+
+The hook is a per-clone safety net — `.git/hooks/pre-push` is not tracked by git, so each clone configures its own pattern list.
+
+**Installation:**
+
+```bash
+cp tools/chunk-runner/hooks/pre-push.example .git/hooks/pre-push
+chmod +x .git/hooks/pre-push
+# then edit the patterns=() array in .git/hooks/pre-push to match your
+# project's specific leakage-pattern set
+```
+
+**Behavior summary** (full detail in the example file's header comment):
+
+- Scans only added lines (`+content`) — removed lines are ignored, so removing a leak doesn't fire the hook.
+- For new branches, scans only commits not yet on `origin/main` (merge-base scope), avoiding the full-history false-positive trap on first-push.
+- Refuses loudly with a banner naming the pattern + up to 5 sample matches; exits non-zero.
+- Bypass with `git push --no-verify` when a match is manually verified safe.
+
+The hook is independent of the chunk-runner pipeline — it applies to every push regardless of whether chunk-runner produced the commits.
+
+---
+
 ## Related docs
 
 - [DECISIONS.md](DECISIONS.md) — 20 design decisions with alternatives + revert paths

@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+# pre-push hook example — refuses to push commits containing internal-leakage patterns.
+#
+# This is a TEMPLATE. The hook itself lives at .git/hooks/pre-push (per-clone, not tracked).
+# Each clone configures its own pattern list via the `patterns=()` array below.
+#
+# Installation:
+#   cp tools/chunk-runner/hooks/pre-push.example .git/hooks/pre-push
+#   chmod +x .git/hooks/pre-push
+#   then edit the patterns=() array below to match your project's leakage-pattern set.
+#
+# To bypass for an emergency push (use only with manual review):
+#   git push --no-verify
+#
+# Behavior:
+#   - Scans only ADDED lines in the diff content (`+content`, excluding `+++ b/file` headers).
+#   - Removed lines (`-content`) are ignored — removing a leak is desirable.
+#   - For new branches, scans only commits not yet on origin/main (merge-base scope).
+#   - For existing branches, scans the new-commits range (`remote_sha..local_sha`).
+#   - Refuses LOUDLY with a banner naming the matched pattern + up to 5 sample matches.
+#   - Exits non-zero on any match; push is aborted.
+
+set -euo pipefail
+
+remote_name="$1"
+remote_url="$2"
+
+# Apply this hook to ALL pushes regardless of remote.
+# Defense in depth in case origin is later swapped or mirrored.
+
+# Patterns that indicate internal information must not leave the local clone.
+# Each pattern is an extended regex; backslash-escape literal regex metacharacters
+# (e.g. `corp\.example\.com` to match a literal corp.example.com).
+# Replace these placeholders with project-specific patterns.
+patterns=(
+  # 'internal-host-prefix'
+  # 'corp\.internal-domain'
+  # '/data/internal-path-prefix'
+  # 'internal-username'
+  # 'internal-email-handle@'
+  # '10\.0\.0\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.'
+)
+
+# If no patterns are configured, the hook is a no-op (allow all pushes).
+if [[ ${#patterns[@]} -eq 0 ]]; then
+  exit 0
+fi
+
+# Read each ref being pushed from stdin (git's pre-push protocol).
+exit_code=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
+    # Branch deletion — nothing to scan.
+    continue
+  fi
+
+  if [[ "$remote_sha" == "0000000000000000000000000000000000000000" ]]; then
+    # New branch — scan only commits not yet on origin/main, NOT the full local history.
+    # The full-history form is a false-positive trap on first-push of a new feature
+    # branch: ancestor commits already on origin (possibly --no-verify'd previously)
+    # would re-trigger the hook. merge-base scopes the scan to genuinely new work.
+    base=$(git merge-base "$local_sha" origin/main 2>/dev/null || true)
+    if [[ -n "$base" ]]; then
+      range="${base}..${local_sha}"
+    else
+      # Fallback when merge-base cannot be determined (e.g., disjoint histories,
+      # very early in repo lifetime): scan full local history reachable from local_sha.
+      range="$local_sha"
+    fi
+  else
+    range="${remote_sha}..${local_sha}"
+  fi
+
+  for pattern in "${patterns[@]}"; do
+    # Search ONLY ADDED lines in the diff content of the range for the pattern.
+    # Removed lines (starting with `-`) are ignored — removing a leak is desirable
+    # and shouldn't trigger the hook. The `^\+[^+]` filter matches `+content` lines
+    # while excluding `+++ b/file` diff headers.
+    if matches=$(git log -p "$range" 2>/dev/null | grep -E '^\+[^+]' | grep -nE "$pattern" || true); [[ -n "$matches" ]]; then
+      echo "==============================================================" >&2
+      echo "pre-push refused: pattern '$pattern' found in commits being pushed" >&2
+      echo "Remote: $remote_name ($remote_url)" >&2
+      echo "Range:  $range" >&2
+      echo "Sample matches (up to 5):" >&2
+      echo "$matches" | head -5 >&2
+      echo >&2
+      echo "Either edit the offending content and amend/rewrite, or — only" >&2
+      echo "if you've manually verified the match is safe — bypass with:" >&2
+      echo "  git push --no-verify" >&2
+      echo "==============================================================" >&2
+      exit_code=1
+    fi
+  done
+done
+
+exit "$exit_code"
