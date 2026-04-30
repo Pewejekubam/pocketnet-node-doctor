@@ -44,13 +44,13 @@ The conforming manifest generator + chunk-store builder + trust-root publisher l
 
 **⚠️ CRITICAL**: All tasks here block every user story phase.
 
-- [ ] T005 [P] Validate `contracts/manifest.schema.json` against the JSON Schema Draft 2020-12 meta-schema; capture pass log to `evidence/schema-meta-validation.log`
-- [ ] T006 [P] Verify `contracts/manifest.schema.json` `$comment` field cites the canonical-form serialization rule (sorted keys, no insignificant whitespace, UTF-8) and names the trust-root construction; capture grep evidence to `evidence/schema-comment-citation.log` (CSC001-001(b))
-- [ ] T007 [P] Verify `contracts/manifest.schema.json` declares `format_version`, `canonical_identity`, `entries`, `trust_anchors` as required at the top level; capture jq-extracted evidence to `evidence/schema-required-fields.log` (CSC001-001(a))
-- [ ] T008 [P] Verify `contracts/manifest.schema.json` enforces the `change_counter` ↔ `pocketdb/main.sqlite3` conditional via the `allOf` if/then/else block; capture evidence to `evidence/schema-change-counter-conditional.log` (CR001-007)
-- [ ] T009 Cross-check `contracts/chunk-url-grammar.md` path-segment grammar against `contracts/manifest.schema.json` `path` regex — ensure both reject `..`, leading `/`, and non-`[A-Za-z0-9_.\-]` component characters; capture diff/consistency check to `evidence/path-grammar-consistency.log` (CR001-004)
-- [ ] T010 Cross-check `contracts/trust-root-format.md` byte-shape (65 bytes; 64 hex + LF) against `data-model.md` Trust-Root section; capture consistency check to `evidence/trust-root-shape-consistency.log` (CR001-006)
-- [ ] T011 Build `harness/stub-server.py` — a minimal Python HTTP server that serves any fixture under the chunk-url grammar, honors the `Accept-Encoding` contract (zstd / gzip pre-compressed at rest, HTTP 406 with `Supported encodings: zstd, gzip\n` body on miss), emits `Vary: Accept-Encoding`, and serves manifest + trust-root sidecar identity-encoded
+- [X] T005 [P] Validate `contracts/manifest.schema.json` against the JSON Schema Draft 2020-12 meta-schema; capture pass log to `evidence/schema-meta-validation.log`
+- [X] T006 [P] Verify `contracts/manifest.schema.json` `$comment` field cites the canonical-form serialization rule (sorted keys, no insignificant whitespace, UTF-8) and names the trust-root construction; capture grep evidence to `evidence/schema-comment-citation.log` (CSC001-001(b))
+- [X] T007 [P] Verify `contracts/manifest.schema.json` declares `format_version`, `canonical_identity`, `entries`, `trust_anchors` as required at the top level; capture jq-extracted evidence to `evidence/schema-required-fields.log` (CSC001-001(a))
+- [X] T008 [P] Verify `contracts/manifest.schema.json` enforces the `change_counter` ↔ `pocketdb/main.sqlite3` conditional via the `allOf` if/then/else block; capture evidence to `evidence/schema-change-counter-conditional.log` (CR001-007)
+- [X] T009 Cross-check `contracts/chunk-url-grammar.md` path-segment grammar against `contracts/manifest.schema.json` `path` regex — ensure both reject `..`, leading `/`, and non-`[A-Za-z0-9_.\-]` component characters; capture diff/consistency check to `evidence/path-grammar-consistency.log` (CR001-004)
+- [X] T010 Cross-check `contracts/trust-root-format.md` byte-shape (65 bytes; 64 hex + LF) against `data-model.md` Trust-Root section; capture consistency check to `evidence/trust-root-shape-consistency.log` (CR001-006)
+- [X] T011 Build `harness/stub-server.py` — a minimal Python HTTP server that serves any fixture under the chunk-url grammar, honors the `Accept-Encoding` contract (zstd / gzip pre-compressed at rest, HTTP 406 with `Supported encodings: zstd, gzip\n` body on miss), emits `Vary: Accept-Encoding`, and serves manifest + trust-root sidecar identity-encoded
 
 **Checkpoint**: Frozen contracts self-consistent; stub server ready; user-story phases unblocked.
 
