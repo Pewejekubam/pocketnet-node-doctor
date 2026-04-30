@@ -1,11 +1,17 @@
 ---
-version: 0.2.2
-status: draft
+version: 1.0.0
+status: approved
 created: 2026-04-30
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: pre-spec.md
 changelog:
+  - version: 1.0.0
+    date: 2026-04-30
+    summary: Approval milestone — Stage 6 formally exited; ready to drive chunk-runner dispatch
+    changes:
+      - "Status flip: draft → approved per process.md major-bump-on-approval rule"
+      - "Chunking has passed Stage 5 audit, Stage 6 refinement, Stage 5 delta-audit, plus the three-digit ID renumber tune-up"
   - version: 0.2.2
     date: 2026-04-30
     summary: Patch — chunk IDs renumbered to three-digit zero-padded form per process.md v0.3.3 convention

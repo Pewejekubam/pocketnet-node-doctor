@@ -1,11 +1,17 @@
 ---
-version: 0.3.3
-status: draft
+version: 1.0.0
+status: approved
 created: 2026-04-29
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: ../../docs/pre-spec-build/process.md
 changelog:
+  - version: 1.0.0
+    date: 2026-04-30
+    summary: Approval milestone — Stage 6 formally exited; ready to drive implementation via chunk-runner
+    changes:
+      - "Status flip: draft → approved per process.md major-bump-on-approval rule"
+      - "Pre-spec has passed Stage 2 audit, Stage 3 refinement, Stage 3.5 sanity check, Stage 5 delta-audit write-back"
   - version: 0.3.3
     date: 2026-04-30
     summary: Patch — apply Stage 5 delta-audit findings against pre-spec write-back content (PSA-08-F01-D, CSA-10-F01-D)
