@@ -1,0 +1,76 @@
+# ============================================================
+# SECRETS & CREDENTIALS — never track
+# ============================================================
+.env
+.env.*
+!.env.example
+.envrc
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+*.token
+secrets/
+credentials/
+
+# ============================================================
+# PRIVATE / LOCAL CONTEXT — may contain sensitive material
+# ============================================================
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.specify/
+private/
+local/
+*.local.*
+*.local
+
+# Per-developer backup utility (configures internal hosts/paths/keys)
+bu-project.sh
+
+# ============================================================
+# BEADS — local-only issue tracker state
+# ============================================================
+.beads/
+.dolt/
+.beads-credential-key
+AGENTS.md
+
+# ============================================================
+# EDITOR & OS
+# ============================================================
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+
+# ============================================================
+# BUILD ARTIFACTS (placeholder for when implementation lands)
+# ============================================================
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+target/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ============================================================
+# LOGS & RUNTIME
+# ============================================================
+*.log
+*.pid
+*.db
+
+# Experiment evidence logs are tracked (community verification of empirical claims)
+!experiments/**/*.log

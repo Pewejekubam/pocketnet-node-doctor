@@ -1,0 +1,108 @@
+OLD: /data/checkpoint-doctor-experiment/march-pocketdb/main.sqlite3 (156832919552 bytes)
+NEW: /data/checkpoint-doctor-experiment/april-source/main.sqlite3 (162171174912 bytes)
+Common: 156832919552 bytes = 38289287 blocks of 4096 bytes
+Extra bytes in NEW (must be downloaded regardless): 5338255360
+Granularities: [4096, 32768, 65536, 131072, 262144, 1048576]
+
+[5s] 1.0% scanned, 274 MB/s, ETA 540s
+[11s] 2.1% scanned, 273 MB/s, ETA 536s
+[17s] 3.1% scanned, 273 MB/s, ETA 531s
+[22s] 4.2% scanned, 272 MB/s, ETA 526s
+[28s] 5.2% scanned, 272 MB/s, ETA 520s
+[34s] 6.3% scanned, 272 MB/s, ETA 515s
+[40s] 7.3% scanned, 272 MB/s, ETA 509s
+[45s] 8.4% scanned, 272 MB/s, ETA 504s
+[51s] 9.4% scanned, 272 MB/s, ETA 498s
+[57s] 10.4% scanned, 272 MB/s, ETA 493s
+[63s] 11.5% scanned, 271 MB/s, ETA 488s
+[69s] 12.5% scanned, 271 MB/s, ETA 482s
+[74s] 13.6% scanned, 271 MB/s, ETA 476s
+[80s] 14.6% scanned, 271 MB/s, ETA 471s
+[86s] 15.7% scanned, 271 MB/s, ETA 465s
+[92s] 16.7% scanned, 271 MB/s, ETA 459s
+[98s] 17.8% scanned, 271 MB/s, ETA 453s
+[103s] 18.8% scanned, 271 MB/s, ETA 448s
+[109s] 19.8% scanned, 271 MB/s, ETA 442s
+[115s] 20.9% scanned, 271 MB/s, ETA 436s
+[120s] 21.9% scanned, 272 MB/s, ETA 429s
+[125s] 23.8% scanned, 283 MB/s, ETA 403s
+[131s] 25.6% scanned, 292 MB/s, ETA 381s
+[136s] 27.4% scanned, 301 MB/s, ETA 360s
+[141s] 28.5% scanned, 300 MB/s, ETA 356s
+[147s] 29.5% scanned, 299 MB/s, ETA 352s
+[153s] 30.6% scanned, 298 MB/s, ETA 348s
+[159s] 31.6% scanned, 297 MB/s, ETA 344s
+[164s] 32.6% scanned, 296 MB/s, ETA 340s
+[170s] 33.7% scanned, 296 MB/s, ETA 334s
+[175s] 34.7% scanned, 296 MB/s, ETA 329s
+[180s] 35.8% scanned, 296 MB/s, ETA 324s
+[186s] 36.8% scanned, 296 MB/s, ETA 319s
+[191s] 37.9% scanned, 296 MB/s, ETA 314s
+[197s] 38.9% scanned, 295 MB/s, ETA 309s
+[202s] 40.0% scanned, 295 MB/s, ETA 304s
+[208s] 41.0% scanned, 294 MB/s, ETA 300s
+[214s] 42.0% scanned, 294 MB/s, ETA 295s
+[219s] 43.1% scanned, 293 MB/s, ETA 290s
+[225s] 44.1% scanned, 293 MB/s, ETA 285s
+[231s] 45.2% scanned, 292 MB/s, ETA 280s
+[236s] 46.2% scanned, 292 MB/s, ETA 275s
+[242s] 47.3% scanned, 292 MB/s, ETA 270s
+[247s] 48.3% scanned, 292 MB/s, ETA 264s
+[252s] 49.4% scanned, 292 MB/s, ETA 259s
+[258s] 50.4% scanned, 291 MB/s, ETA 254s
+[264s] 51.5% scanned, 291 MB/s, ETA 249s
+[270s] 52.5% scanned, 291 MB/s, ETA 244s
+[275s] 53.5% scanned, 291 MB/s, ETA 238s
+[281s] 55.1% scanned, 293 MB/s, ETA 229s
+[286s] 56.4% scanned, 295 MB/s, ETA 221s
+[291s] 57.5% scanned, 295 MB/s, ETA 215s
+[296s] 58.5% scanned, 295 MB/s, ETA 210s
+[301s] 59.5% scanned, 295 MB/s, ETA 205s
+[307s] 60.6% scanned, 295 MB/s, ETA 199s
+[312s] 61.6% scanned, 295 MB/s, ETA 194s
+[317s] 62.7% scanned, 295 MB/s, ETA 189s
+[323s] 63.7% scanned, 295 MB/s, ETA 183s
+[328s] 64.8% scanned, 295 MB/s, ETA 178s
+[333s] 65.8% scanned, 295 MB/s, ETA 173s
+[339s] 67.1% scanned, 296 MB/s, ETA 166s
+[344s] 68.2% scanned, 296 MB/s, ETA 160s
+[349s] 69.2% scanned, 296 MB/s, ETA 155s
+[354s] 70.3% scanned, 296 MB/s, ETA 150s
+[359s] 71.3% scanned, 296 MB/s, ETA 144s
+[364s] 72.3% scanned, 297 MB/s, ETA 139s
+[369s] 73.4% scanned, 297 MB/s, ETA 134s
+[375s] 74.4% scanned, 297 MB/s, ETA 128s
+[380s] 75.5% scanned, 297 MB/s, ETA 123s
+[385s] 76.5% scanned, 297 MB/s, ETA 118s
+[390s] 77.6% scanned, 297 MB/s, ETA 112s
+[395s] 78.6% scanned, 297 MB/s, ETA 107s
+[400s] 79.7% scanned, 297 MB/s, ETA 102s
+[406s] 80.7% scanned, 297 MB/s, ETA 97s
+[411s] 81.7% scanned, 297 MB/s, ETA 91s
+[416s] 82.8% scanned, 297 MB/s, ETA 86s
+[421s] 83.8% scanned, 298 MB/s, ETA 81s
+[426s] 84.9% scanned, 298 MB/s, ETA 75s
+[431s] 85.9% scanned, 298 MB/s, ETA 70s
+[436s] 87.0% scanned, 298 MB/s, ETA 65s
+[442s] 88.3% scanned, 298 MB/s, ETA 58s
+[448s] 89.6% scanned, 299 MB/s, ETA 52s
+[454s] 90.9% scanned, 299 MB/s, ETA 45s
+[461s] 92.2% scanned, 299 MB/s, ETA 39s
+[467s] 93.5% scanned, 299 MB/s, ETA 32s
+[473s] 94.8% scanned, 300 MB/s, ETA 25s
+[479s] 96.1% scanned, 300 MB/s, ETA 19s
+[484s] 97.4% scanned, 300 MB/s, ETA 12s
+[490s] 98.7% scanned, 301 MB/s, ETA 6s
+
+Scan complete in 496.3s
+
+     Block          Total        Matched    Reuse        BytesNeed       NeedMB
+--------------------------------------------------------------------------------
+      4096       38289287       32862202   85.83%      27567595520       26291MB
+     32768        4786160        2731112   57.06%      72678068224       69311MB
+     65536        2393080        1128881   47.17%      88188801024       84103MB
+    131072        1196540         496502   41.49%      97093636096       92596MB
+    262144         598270         231610   38.71%     101455974400       96756MB
+   1048576         149567          53342   35.66%     106237480960      101316MB
+
+Reference: full file size = 162171174912 bytes (151.0 GB)
