@@ -2,7 +2,7 @@
 
 **Feature Branch**: `002-001-delta-recovery-client-chunk-001`
 **Created**: 2026-04-30
-**Status**: Draft
+**Status**: Implemented
 **Input**: User description: "Chunk 001 of 001-delta-recovery-client. Extend the existing pocketnet_create_checkpoint workflow to publish a frozen manifest schema, a per-canonical manifest, an HTTPS-addressable chunk store, and a published trust-root SHA-256 alongside each full-snapshot artifact, so that the doctor (downstream chunks) can authenticate canonicals and fetch only differing chunks."
 
 ## Context anchors
