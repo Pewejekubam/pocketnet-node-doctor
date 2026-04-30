@@ -123,17 +123,17 @@ The conforming manifest generator + chunk-store builder + trust-root publisher l
 
 ### RED tests for User Story 3
 
-- [ ] T030 [P] [US3] Author `harness/verify-change-counter.sh` — extracts `change_counter` from the `pocketdb/main.sqlite3` `sqlite_pages` entry, asserts integer ≥ 0, asserts no other `sqlite_pages` entry carries the field (CR001-007, US-3 AS-1)
+- [X] T030 [P] [US3] Author `harness/verify-change-counter.sh` — extracts `change_counter` from the `pocketdb/main.sqlite3` `sqlite_pages` entry, asserts integer ≥ 0, asserts no other `sqlite_pages` entry carries the field (CR001-007, US-3 AS-1)
 
 ### Negative-test fixtures for User Story 3
 
-- [ ] T031 [P] [US3] Generate `fixtures/negative/cc-on-other-sqlite.json` — manifest variant with `change_counter` placed on a non-`main.sqlite3` `sqlite_pages` entry; schema MUST reject
-- [ ] T032 [P] [US3] Generate `fixtures/negative/cc-missing-on-main.json` — manifest variant with the `main.sqlite3` `sqlite_pages` entry omitting `change_counter`; schema MUST reject
+- [X] T031 [P] [US3] Generate `fixtures/negative/cc-on-other-sqlite.json` — manifest variant with `change_counter` placed on a non-`main.sqlite3` `sqlite_pages` entry; schema MUST reject
+- [X] T032 [P] [US3] Generate `fixtures/negative/cc-missing-on-main.json` — manifest variant with the `main.sqlite3` `sqlite_pages` entry omitting `change_counter`; schema MUST reject
 
 ### GREEN verification for User Story 3
 
-- [ ] T033 [US3] Execute `harness/verify-change-counter.sh fixtures/canonical/served/manifest.json`; capture pass log to `evidence/us3-change-counter-pass.log`
-- [ ] T034 [US3] Execute `harness/verify-schema.sh fixtures/negative/cc-on-other-sqlite.json` and `harness/verify-schema.sh fixtures/negative/cc-missing-on-main.json`; assert non-zero exit on each; capture rejection logs to `evidence/us3-negative-rejections.log`
+- [X] T033 [US3] Execute `harness/verify-change-counter.sh fixtures/canonical/served/manifest.json`; capture pass log to `evidence/us3-change-counter-pass.log`
+- [X] T034 [US3] Execute `harness/verify-schema.sh fixtures/negative/cc-on-other-sqlite.json` and `harness/verify-schema.sh fixtures/negative/cc-missing-on-main.json`; assert non-zero exit on each; capture rejection logs to `evidence/us3-negative-rejections.log`
 
 **Checkpoint**: CR001-007 verified — `change_counter` is exposed exclusively on the `main.sqlite3` entry.
 

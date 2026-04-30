@@ -36,5 +36,6 @@ if "$CHECKER" --schemafile "$SCHEMA" "$MANIFEST"; then
   exit 0
 fi
 
-echo "verify-schema VIOLATION: $MANIFEST does not validate against $SCHEMA" >&2
+# Stable relative reference so captured evidence does not leak local paths.
+echo "verify-schema VIOLATION: $MANIFEST does not validate against contracts/manifest.schema.json" >&2
 exit 1
