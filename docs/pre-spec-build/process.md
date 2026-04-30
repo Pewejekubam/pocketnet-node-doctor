@@ -1,10 +1,15 @@
 ---
-version: 0.3.3
+version: 0.3.4
 status: draft
 created: 2026-02-23
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 changelog:
+  - version: 0.3.4
+    date: 2026-04-30
+    summary: Patch — codify post-merge Progress Tracker terminal state (`Merged`) closing the runner-handoff-to-finish chain
+    changes:
+      - "Stage 7 § Post-Implementation Reconciliation: new closing paragraph defines `Merged` as the post-merge Progress Tracker terminal state. The runner does not write this state (consistent with the no-auto-merge constraint); it is applied by the human-driven `/speckit.superb.finish` merge or by the human operator after manual merge. Closes the post-merge bookkeeping gap that v0.3.2 named runner reconciliation but left silent on what happens after the merge."
   - version: 0.3.3
     date: 2026-04-30
     summary: Patch — codify three-digit zero-padded chunk ID convention as a Stage 4 Progress Tracker authoring rule
@@ -458,6 +463,8 @@ The chunking document carries per-chunk: scope, prior artifact boundaries, edge 
 These steps are individually idempotent — re-running any one of them on a partially-completed branch is a no-op. If a transient failure interrupts the loop (e.g. an `index.lock` race), the runner's checkpoint mechanism resumes from the failed step on the next monitor tick. Manual completion follows the same step list in order.
 
 The reconciliation output: a feature branch on origin with two extra commits past the `superb.verify` HEAD (spec-status flip + as-built reconciliation), a chunking doc that reflects what was actually built, and a closure trail through the Epic and heartbeat beads. Merge into the integration target is a separate human decision and is NOT part of this loop — the auto-chunk-runner explicitly never merges.
+
+**Post-merge Progress Tracker terminal state.** After the human-driven `/speckit.superb.finish` merge completes (or after equivalent direct-path acceptance), the Progress Tracker row's status flips from `Implementation Complete — Awaiting Merge` → `Merged`. The runner does not write this state — consistent with the no-auto-merge constraint, post-merge bookkeeping is the finish skill's or human operator's responsibility. `Merged` is the terminal Progress Tracker state for that chunk; the chunking-doc patch-version bump that records the flip is the audit-trail anchor for the merge event.
 
 #### Direct Path (via Stage 3.5)
 

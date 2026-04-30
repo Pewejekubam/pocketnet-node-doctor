@@ -1,11 +1,16 @@
 ---
-version: 1.0.1
+version: 1.0.2
 status: approved
 created: 2026-04-30
 last_modified: 2026-04-30
 authors: [pewejekubam, claude]
 related: pre-spec.md
 changelog:
+  - version: 1.0.2
+    date: 2026-04-30
+    summary: Patch — Chunk 001 merged to main; Progress Tracker row flipped to terminal state per process.md v0.3.4 post-merge convention
+    changes:
+      - "Progress Tracker: Chunk 001 status `Implementation Complete — Awaiting Merge` → `Merged` (terminal state)"
   - version: 1.0.1
     date: 2026-04-30
     summary: Patch — Chunk 001 implementation complete; Progress Tracker row + per-chunk addendum recording the auto-chunk-runner run signature
@@ -120,7 +125,7 @@ Chunk 005 — Release Polish
 
 | Chunk | Title | FRs | SCs | Status |
 |-------|-------|-----|-----|--------|
-| 001 | Server-Side: Manifest Schema + Chunk Store Generation | CR001-001..008 | SC-007 (drill prerequisite) | Implementation Complete — Awaiting Merge |
+| 001 | Server-Side: Manifest Schema + Chunk Store Generation | CR001-001..008 | SC-007 (drill prerequisite) | Merged |
 | 002 | Client Foundation + Diagnose | FR-001, FR-002, FR-003, FR-004, FR-005, FR-010, FR-011, FR-012, FR-013, FR-017, FR-018 | SC-001 (timing half), SC-002, SC-006 | Pending |
 | 003 | Client Apply | FR-006, FR-007, FR-008, FR-009, FR-014, FR-015, FR-016, FR-019, FR-020 | SC-001 (fetch-size half), SC-003, SC-004, SC-005 | Pending |
 | 004 | End-to-End Drill + Network Resilience | (no new FRs; integration of all prior) | SC-007, SC-008 | Pending |
