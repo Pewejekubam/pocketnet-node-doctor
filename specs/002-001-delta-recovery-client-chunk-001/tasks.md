@@ -64,28 +64,28 @@ The conforming manifest generator + chunk-store builder + trust-root publisher l
 
 ### Fixtures (test data)
 
-- [ ] T012 [P] [US1] Generate synthetic `pocketdb/main.sqlite3` source bytes (≥ 4 pages, page-aligned to 4096; valid SQLite header carrying a chosen `change_counter` integer) at `fixtures/canonical/source/pocketdb/main.sqlite3`
-- [ ] T013 [P] [US1] Generate synthetic `blocks/000000.dat` source bytes (small, opaque) at `fixtures/canonical/source/blocks/000000.dat`
-- [ ] T014 [P] [US1] Generate synthetic `chainstate/CURRENT` source bytes (small, opaque) at `fixtures/canonical/source/chainstate/CURRENT`
+- [X] T012 [P] [US1] Generate synthetic `pocketdb/main.sqlite3` source bytes (≥ 4 pages, page-aligned to 4096; valid SQLite header carrying a chosen `change_counter` integer) at `fixtures/canonical/source/pocketdb/main.sqlite3`
+- [X] T013 [P] [US1] Generate synthetic `blocks/000000.dat` source bytes (small, opaque) at `fixtures/canonical/source/blocks/000000.dat`
+- [X] T014 [P] [US1] Generate synthetic `chainstate/CURRENT` source bytes (small, opaque) at `fixtures/canonical/source/chainstate/CURRENT`
 
 ### RED tests for User Story 1
 
-- [ ] T015 [P] [US1] Author `harness/verify-schema.sh` — runs `check-jsonschema --schemafile contracts/manifest.schema.json <manifest>`; exits non-zero on any validation failure (US-1 AS-2)
-- [ ] T016 [P] [US1] Author `harness/verify-trust-root.sh` — re-serializes `<manifest>` via `jq -cS . | tr -d '\n'`, hashes with `sha256sum`, compares to first 64 chars of `<sidecar>`; exits non-zero on mismatch (US-1 AS-1, CR001-006)
-- [ ] T017 [P] [US1] Author `harness/verify-sampled-chunks.sh` — selects (a) first `sqlite_pages` page on `pocketdb/main.sqlite3`, (b) first `whole_file` entry under `blocks/`, (c) first `whole_file` entry under `chainstate/`; for each, GETs the chunk URL with `Accept-Encoding: zstd`, decompresses, hashes, compares to manifest's recorded hash (US-1 AS-3, AS-4, AS-5)
+- [X] T015 [P] [US1] Author `harness/verify-schema.sh` — runs `check-jsonschema --schemafile contracts/manifest.schema.json <manifest>`; exits non-zero on any validation failure (US-1 AS-2)
+- [X] T016 [P] [US1] Author `harness/verify-trust-root.sh` — re-serializes `<manifest>` via `jq -cS . | tr -d '\n'`, hashes with `sha256sum`, compares to first 64 chars of `<sidecar>`; exits non-zero on mismatch (US-1 AS-1, CR001-006)
+- [X] T017 [P] [US1] Author `harness/verify-sampled-chunks.sh` — selects (a) first `sqlite_pages` page on `pocketdb/main.sqlite3`, (b) first `whole_file` entry under `blocks/`, (c) first `whole_file` entry under `chainstate/`; for each, GETs the chunk URL with `Accept-Encoding: zstd`, decompresses, hashes, compares to manifest's recorded hash (US-1 AS-3, AS-4, AS-5)
 
 ### Implementation for User Story 1
 
-- [ ] T018 [US1] Generate `fixtures/canonical/served/manifest.json` enumerating one `sqlite_pages` entry for `pocketdb/main.sqlite3` (every 4 KB page covered, sorted by offset, including `change_counter`) and `whole_file` entries for the `blocks/` and `chainstate/` source files; honors canonical-form serialization (sorted keys, no insignificant whitespace) (depends T012, T013, T014)
-- [ ] T019 [US1] Generate `fixtures/canonical/served/trust-root.sha256` — exactly 64 lowercase hex chars (SHA-256 of canonical-form-serialized manifest) followed by a single LF (depends T018)
-- [ ] T020 [P] [US1] Pre-compress every chunk source byte-stream into `<chunk-path>.zst` variants under `fixtures/canonical/served/files/...` (per-page splits for `main.sqlite3`, whole-file for others) (depends T012, T013, T014)
-- [ ] T021 [P] [US1] Pre-compress every chunk source byte-stream into `<chunk-path>.gz` variants under `fixtures/canonical/served/files/...` (depends T012, T013, T014)
+- [X] T018 [US1] Generate `fixtures/canonical/served/manifest.json` enumerating one `sqlite_pages` entry for `pocketdb/main.sqlite3` (every 4 KB page covered, sorted by offset, including `change_counter`) and `whole_file` entries for the `blocks/` and `chainstate/` source files; honors canonical-form serialization (sorted keys, no insignificant whitespace) (depends T012, T013, T014)
+- [X] T019 [US1] Generate `fixtures/canonical/served/trust-root.sha256` — exactly 64 lowercase hex chars (SHA-256 of canonical-form-serialized manifest) followed by a single LF (depends T018)
+- [X] T020 [P] [US1] Pre-compress every chunk source byte-stream into `<chunk-path>.zst` variants under `fixtures/canonical/served/files/...` (per-page splits for `main.sqlite3`, whole-file for others) (depends T012, T013, T014)
+- [X] T021 [P] [US1] Pre-compress every chunk source byte-stream into `<chunk-path>.gz` variants under `fixtures/canonical/served/files/...` (depends T012, T013, T014)
 
 ### GREEN verification for User Story 1
 
-- [ ] T022 [US1] Run `harness/stub-server.py fixtures/canonical/served/` and execute `harness/verify-schema.sh fixtures/canonical/served/manifest.json`; capture pass log to `evidence/us1-schema-pass.log`
-- [ ] T023 [US1] Execute `harness/verify-trust-root.sh fixtures/canonical/served/manifest.json fixtures/canonical/served/trust-root.sha256`; capture pass log to `evidence/us1-trust-root-pass.log`
-- [ ] T024 [US1] Execute `harness/verify-sampled-chunks.sh <stub-base-url> fixtures/canonical/served/manifest.json`; capture pass log to `evidence/us1-sampled-chunks-pass.log`
+- [X] T022 [US1] Run `harness/stub-server.py fixtures/canonical/served/` and execute `harness/verify-schema.sh fixtures/canonical/served/manifest.json`; capture pass log to `evidence/us1-schema-pass.log`
+- [X] T023 [US1] Execute `harness/verify-trust-root.sh fixtures/canonical/served/manifest.json fixtures/canonical/served/trust-root.sha256`; capture pass log to `evidence/us1-trust-root-pass.log`
+- [X] T024 [US1] Execute `harness/verify-sampled-chunks.sh <stub-base-url> fixtures/canonical/served/manifest.json`; capture pass log to `evidence/us1-sampled-chunks-pass.log`
 
 **Checkpoint**: US1 fully verified end-to-end against the synthetic fixture; this is the MVP — chunking-doc Independent Test for US-1 passes.
 
