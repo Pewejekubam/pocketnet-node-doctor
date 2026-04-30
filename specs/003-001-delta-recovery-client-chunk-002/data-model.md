@@ -110,7 +110,7 @@ A pre-flight check that, on a positive trigger, emits a diagnostic on stderr and
 |---|---|---|---|
 | running-node | 2 | 1st | advisory-lock probe + process-table scan (D8) |
 | pocketnet-core-version mismatch | 4 | 2nd | local `pocketnet-core` binary `--version` invocation; string-compare against `manifest.canonical_identity.pocketnet_core_version` |
-| volume-capacity | 5 | 3rd | `statfs(2)` on the resolved `--pocketdb` parent volume; required free space = 2 × sum of plan-listed-files-size; predicate fires when free space < required |
+| volume-capacity | 5 | 3rd | `statfs(2)` on the resolved `--pocketdb` parent volume; required free space = 2 × Σ(manifest entry sizes) (worst-case bound at diagnose-stage pre-flight, where the plan does not yet exist; spec FR-013's "2× plan-listed-files-size" is the apply-time refinement, and the manifest sum strictly bounds the plan sum from above); predicate fires when free space < required |
 | permission/read-only | 6 | 4th | `access(W_OK)` probe + mount-flag check (read-only mount) on the volume holding `pocketdb/` |
 | ahead-of-canonical | 3 | 5th | direct SQLite-header parse of `pocketdb/main.sqlite3` (D7); `local_change_counter > canonical_change_counter` |
 

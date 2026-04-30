@@ -11,7 +11,7 @@ The chunk inherits Chunk 001's frozen manifest schema and the v1 development tru
 ## Technical Context
 
 **Language/Version**: Go (specific minor version pinned at task-stage from current stable). Single static binary across Linux, macOS, Windows; no runtime dependencies. (Inherits pre-spec Implementation Context.)
-**Primary Dependencies**: standard library `net/http` (chunking-doc Speckit Stop), standard library `flag` (CLI parsing — see D4), `modernc.org/sqlite` (Go SQLite binding — see D2; CGO-free pure-Go transpiled SQLite).
+**Primary Dependencies**: standard library `net/http` (chunking-doc Speckit Stop), standard library `flag` (CLI parsing — see D4), `modernc.org/sqlite` (Go SQLite binding — see D2; CGO-free pure-Go transpiled SQLite), `gopsutil/v3/process` (running-node process scan — see D8; pure-Go), `golang.org/x/sys/unix` and `golang.org/x/sys/windows` (advisory-lock probe + mount-flag introspection — see D8, D15; pure-Go syscall wrappers).
 **Storage**: filesystem only. Doctor reads `pocketdb/` (read-only this chunk), writes `plan.json` to the operator-resolved `--plan-out` path. No databases, no caches.
 **Testing**: standard library `testing`. No third-party test framework. Contract tests under `tests/contract/`, integration tests under `tests/integration/`, unit tests alongside production code (`*_test.go` per Go convention).
 **Target Platform**: Linux, macOS, Windows. Reference rig for SC-001 timing: 8 vCPU x86_64, NVMe-class disk, 16 GB RAM (pre-spec Implementation Context).
