@@ -147,15 +147,15 @@ The conforming manifest generator + chunk-store builder + trust-root publisher l
 
 ### RED tests for User Story 4
 
-- [ ] T035 [P] [US4] Author `harness/verify-accept-encoding-zstd.sh` — `curl -sS -i -H 'Accept-Encoding: zstd' <chunk-url>`; assert HTTP 200, `Content-Encoding: zstd`, decompressed payload's SHA-256 matches manifest's recorded hash (US-4 AS-1)
-- [ ] T036 [P] [US4] Author `harness/verify-accept-encoding-gzip.sh` — `curl -sS -i -H 'Accept-Encoding: gzip' <chunk-url>`; assert HTTP 200, `Content-Encoding: gzip`, decompressed payload's SHA-256 matches manifest's recorded hash (US-4 AS-2)
-- [ ] T037 [P] [US4] Author `harness/verify-accept-encoding-406.sh` — `curl -sS -i -H 'Accept-Encoding: identity' <chunk-url>`; assert HTTP 406, body grep matches both `zstd` and `gzip` (US-4 AS-3, CR001-005)
+- [X] T035 [P] [US4] Author `harness/verify-accept-encoding-zstd.sh` — `curl -sS -i -H 'Accept-Encoding: zstd' <chunk-url>`; assert HTTP 200, `Content-Encoding: zstd`, decompressed payload's SHA-256 matches manifest's recorded hash (US-4 AS-1)
+- [X] T036 [P] [US4] Author `harness/verify-accept-encoding-gzip.sh` — `curl -sS -i -H 'Accept-Encoding: gzip' <chunk-url>`; assert HTTP 200, `Content-Encoding: gzip`, decompressed payload's SHA-256 matches manifest's recorded hash (US-4 AS-2)
+- [X] T037 [P] [US4] Author `harness/verify-accept-encoding-406.sh` — `curl -sS -i -H 'Accept-Encoding: identity' <chunk-url>`; assert HTTP 406, body grep matches both `zstd` and `gzip` (US-4 AS-3, CR001-005)
 
 ### GREEN verification for User Story 4
 
-- [ ] T038 [US4] Run `harness/stub-server.py fixtures/canonical/served/` and execute `harness/verify-accept-encoding-zstd.sh <stub-base-url>/files/pocketdb/main.sqlite3/pages/0`; capture pass log to `evidence/us4-zstd-pass.log`
-- [ ] T039 [US4] Execute `harness/verify-accept-encoding-gzip.sh <stub-base-url>/files/pocketdb/main.sqlite3/pages/0`; capture pass log to `evidence/us4-gzip-pass.log`
-- [ ] T040 [US4] Execute `harness/verify-accept-encoding-406.sh <stub-base-url>/files/pocketdb/main.sqlite3/pages/0`; capture pass log to `evidence/us4-406-pass.log`
+- [X] T038 [US4] Run `harness/stub-server.py fixtures/canonical/served/` and execute `harness/verify-accept-encoding-zstd.sh <stub-base-url>/files/pocketdb/main.sqlite3/pages/0`; capture pass log to `evidence/us4-zstd-pass.log`
+- [X] T039 [US4] Execute `harness/verify-accept-encoding-gzip.sh <stub-base-url>/files/pocketdb/main.sqlite3/pages/0`; capture pass log to `evidence/us4-gzip-pass.log`
+- [X] T040 [US4] Execute `harness/verify-accept-encoding-406.sh <stub-base-url>/files/pocketdb/main.sqlite3/pages/0`; capture pass log to `evidence/us4-406-pass.log`
 
 **Checkpoint**: CR001-005 and US-4 verified end-to-end against the stub server.
 
