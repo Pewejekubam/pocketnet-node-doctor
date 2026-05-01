@@ -67,6 +67,10 @@ rsync_to_rig "$HELPER_LOCAL" "$REFERENCE_RIG_BASE/bin/"
 
 OUT="$REFERENCE_RIG_BASE/manifests/manifest.json"
 echo "==> Minting manifest on rig from $SQLITE_PATH" >&2
+# Capture stdout only (the 64-hex trust-root); let rig-helper stderr flow to
+# the operator's terminal via SSH's stderr channel. SSH multiplexes stdout and
+# stderr over separate protocol channels, so 2>&1 | tail -1 is unreliable —
+# the channels may arrive interleaved in any order on the client side.
 TRUST_ROOT="$(ssh_rig "
   '$REFERENCE_RIG_BASE/bin/rig-helper-$SHA' mint \
     --sqlite '$SQLITE_PATH' \
@@ -75,7 +79,7 @@ TRUST_ROOT="$(ssh_rig "
     --created-at '$CREATED_AT' \
     --out '$OUT' \
     ${WHOLE_FILE_ARGS[*]}
-" 2>&1 | tail -1)"
+")"
 
 if ! [[ "$TRUST_ROOT" =~ ^[0-9a-f]{64}$ ]]; then
   echo "ERROR: rig-helper did not return a 64-hex trust-root; got: $TRUST_ROOT" >&2
