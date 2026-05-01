@@ -87,30 +87,30 @@ Idiomatic Go layout (per plan.md § Project Structure):
 
 ### US3 fixtures
 
-- [ ] T022 [P] [US3] Create manifest fixture corpus in `tests/integration/testdata/manifests/`: `valid_v1.json` (parses, hashes to a known trust-root we mint here), `tampered.json` (bytewise edited after minting), `format_version_2.json` (otherwise valid manifest with `format_version: 2`), `trust_anchors_nonempty.json` (valid v1 manifest with `trust_anchors: {"experimental": "ignored-by-v1"}`); record each manifest's canonform SHA-256 in `expected.txt`.
-- [ ] T023 [P] [US3] Create test HTTPS rig harness in `tests/integration/testdata/rigs/manifest_serving.go`: `httptest.NewTLSServer` instances Rig A/B/C/D each serving the corresponding fixture at `/canonicals/3806626/manifest.json`.
+- [X] T022 [P] [US3] Create manifest fixture corpus in `tests/integration/testdata/manifests/`: `valid_v1.json` (parses, hashes to a known trust-root we mint here), `tampered.json` (bytewise edited after minting), `format_version_2.json` (otherwise valid manifest with `format_version: 2`), `trust_anchors_nonempty.json` (valid v1 manifest with `trust_anchors: {"experimental": "ignored-by-v1"}`); record each manifest's canonform SHA-256 in `expected.txt`.
+- [X] T023 [P] [US3] Create test HTTPS rig harness in `tests/integration/testdata/rigs/manifest_serving.go`: `httptest.NewTLSServer` instances Rig A/B/C/D each serving the corresponding fixture at `/canonicals/3806626/manifest.json`.
 
 ### US3 RED tests
 
-- [ ] T024 [P] [US3] `tests/contract/manifest_schema_test.go` — load Chunk 001's manifest schema (sibling spec dir's `contracts/manifest.schema.json`) and validate the four fixtures from T022 — `valid_v1`, `format_version_2`, `trust_anchors_nonempty` parse cleanly; `tampered` may or may not depending on tamper kind (document expectation in test).
-- [ ] T025 [P] [US3] `internal/manifest/fetch_test.go` — `Fetch(ctx, url) ([]byte, error)` GETs manifest via stdlib `net/http`; 30 s timeout (D17); custom `User-Agent: pocketnet-node-doctor/<version> (chunk-002)` header set; HTTPS-only enforcement (refuse non-`https://` URLs).
-- [ ] T026 [P] [US3] `internal/manifest/verify_test.go` — `Verify(bytes []byte, pinnedHash string) error` re-serializes parsed manifest via `internal/canonform` and SHA-256s; PASS when computed == pinned; REFUSE with `TrustRootMismatchError{Computed, Expected}` (EC-008) when ≠.
-- [ ] T027 [P] [US3] `internal/manifest/parse_test.go` — `Parse(bytes []byte) (*Manifest, error)` typed-struct unmarshal of v1 manifest fields the doctor consumes (per data-model.md § Entity: Manifest (consumed)): `format_version`, `canonical_identity.{block_height,pocketnet_core_version,created_at}`, `entries[*]` (page-level for `main.sqlite3`, whole-file for non-SQLite), `entries[*].change_counter` (where `path == "pocketdb/main.sqlite3"`), `trust_anchors`.
-- [ ] T028 [P] [US3] `internal/manifest/format_version_test.go` — `CheckFormatVersion(*Manifest) error` PASS when `format_version == 1`; REFUSE with `FormatVersionUnrecognizedError{Got, Recognized: 1}` when `≠ 1` (CSC002-002).
-- [ ] T029 [P] [US3] `internal/manifest/trust_anchors_test.go` — non-empty `trust_anchors` block parsed for presence (required field per Chunk 001 schema) but contents not inspected; doctor proceeds normally (FR-018; US-003 acceptance scenario 4).
-- [ ] T030 [P] [US3] `tests/integration/us003_trust_root_test.go` — end-to-end: drive `internal/manifest` against Rig A → `Verify` PASS; Rig B → `Verify` returns `TrustRootMismatchError`, no subsequent chunk-store fetch attempted (assertion: rig logs zero post-manifest GETs); Rig C → `CheckFormatVersion` returns `FormatVersionUnrecognizedError`, mapped exit 7 by orchestrator; Rig D → both Verify and CheckFormatVersion PASS, `trust_anchors` populated but contents not consulted (US-003 acceptance scenarios 1–4).
+- [X] T024 [P] [US3] `tests/contract/manifest_schema_test.go` — load Chunk 001's manifest schema (sibling spec dir's `contracts/manifest.schema.json`) and validate the four fixtures from T022 — `valid_v1`, `format_version_2`, `trust_anchors_nonempty` parse cleanly; `tampered` may or may not depending on tamper kind (document expectation in test).
+- [X] T025 [P] [US3] `internal/manifest/fetch_test.go` — `Fetch(ctx, url) ([]byte, error)` GETs manifest via stdlib `net/http`; 30 s timeout (D17); custom `User-Agent: pocketnet-node-doctor/<version> (chunk-002)` header set; HTTPS-only enforcement (refuse non-`https://` URLs).
+- [X] T026 [P] [US3] `internal/manifest/verify_test.go` — `Verify(bytes []byte, pinnedHash string) error` re-serializes parsed manifest via `internal/canonform` and SHA-256s; PASS when computed == pinned; REFUSE with `TrustRootMismatchError{Computed, Expected}` (EC-008) when ≠.
+- [X] T027 [P] [US3] `internal/manifest/parse_test.go` — `Parse(bytes []byte) (*Manifest, error)` typed-struct unmarshal of v1 manifest fields the doctor consumes (per data-model.md § Entity: Manifest (consumed)): `format_version`, `canonical_identity.{block_height,pocketnet_core_version,created_at}`, `entries[*]` (page-level for `main.sqlite3`, whole-file for non-SQLite), `entries[*].change_counter` (where `path == "pocketdb/main.sqlite3"`), `trust_anchors`.
+- [X] T028 [P] [US3] `internal/manifest/format_version_test.go` — `CheckFormatVersion(*Manifest) error` PASS when `format_version == 1`; REFUSE with `FormatVersionUnrecognizedError{Got, Recognized: 1}` when `≠ 1` (CSC002-002).
+- [X] T029 [P] [US3] `internal/manifest/trust_anchors_test.go` — non-empty `trust_anchors` block parsed for presence (required field per Chunk 001 schema) but contents not inspected; doctor proceeds normally (FR-018; US-003 acceptance scenario 4).
+- [X] T030 [P] [US3] `tests/integration/us003_trust_root_test.go` — end-to-end: drive `internal/manifest` against Rig A → `Verify` PASS; Rig B → `Verify` returns `TrustRootMismatchError`, no subsequent chunk-store fetch attempted (assertion: rig logs zero post-manifest GETs); Rig C → `CheckFormatVersion` returns `FormatVersionUnrecognizedError`, mapped exit 7 by orchestrator; Rig D → both Verify and CheckFormatVersion PASS, `trust_anchors` populated but contents not consulted (US-003 acceptance scenarios 1–4).
 
 ### US3 implementations
 
-- [ ] T031 [P] [US3] `internal/manifest/fetch.go` — `Fetch(ctx context.Context, url string) ([]byte, error)` with `http.Client{Timeout: 30 * time.Second}`, default redirect (follow up to 10), default TLS (system CA trust), custom `User-Agent` via custom `http.RoundTripper` per D17.
-- [ ] T032 [P] [US3] `internal/manifest/verify.go` — `Verify(bytes []byte, pinnedHash string) error`. Steps per D13: parse → canonform-re-serialize → SHA-256 → compare. Mismatch returns `TrustRootMismatchError{Computed, Expected string}`.
-- [ ] T033 [P] [US3] `internal/manifest/parse.go` — typed `Manifest` struct mirroring Chunk 001's frozen schema (data-model.md § Entity: Manifest (consumed)); `Parse(bytes []byte) (*Manifest, error)` via `encoding/json`.
-- [ ] T034 [P] [US3] `internal/manifest/format_version.go` — `CheckFormatVersion(m *Manifest) error`; `FormatVersionUnrecognizedError` typed.
-- [ ] T035 [US3] `internal/manifest/trust_anchors.go` — `ParseTrustAnchors(m *Manifest) (TrustAnchors, error)`; presence-required, contents-ignored (FR-018).
+- [X] T031 [P] [US3] `internal/manifest/fetch.go` — `Fetch(ctx context.Context, url string) ([]byte, error)` with `http.Client{Timeout: 30 * time.Second}`, default redirect (follow up to 10), default TLS (system CA trust), custom `User-Agent` via custom `http.RoundTripper` per D17.
+- [X] T032 [P] [US3] `internal/manifest/verify.go` — `Verify(bytes []byte, pinnedHash string) error`. Steps per D13: parse → canonform-re-serialize → SHA-256 → compare. Mismatch returns `TrustRootMismatchError{Computed, Expected string}`.
+- [X] T033 [P] [US3] `internal/manifest/parse.go` — typed `Manifest` struct mirroring Chunk 001's frozen schema (data-model.md § Entity: Manifest (consumed)); `Parse(bytes []byte) (*Manifest, error)` via `encoding/json`.
+- [X] T034 [P] [US3] `internal/manifest/format_version.go` — `CheckFormatVersion(m *Manifest) error`; `FormatVersionUnrecognizedError` typed.
+- [X] T035 [US3] `internal/manifest/trust_anchors.go` — `ParseTrustAnchors(m *Manifest) (TrustAnchors, error)`; presence-required, contents-ignored (FR-018).
 
 ### US3 GREEN verification
 
-- [ ] T036 [US3] Run `go test ./internal/manifest/... ./tests/contract/manifest_schema_test.go ./tests/integration/us003_trust_root_test.go` and confirm all US3 tests pass.
+- [X] T036 [US3] Run `go test ./internal/manifest/... ./tests/contract/manifest_schema_test.go ./tests/integration/us003_trust_root_test.go` and confirm all US3 tests pass.
 
 **Checkpoint**: Manifest verifier (US-003) is fully functional and independently testable. US2 + US1 may now consume `*Manifest`.
 
