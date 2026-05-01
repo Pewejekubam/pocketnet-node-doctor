@@ -3,17 +3,14 @@
 package integration
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/pocketnet-team/pocketnet-node-doctor/internal/canonform"
 	"github.com/pocketnet-team/pocketnet-node-doctor/internal/manifest"
 	"github.com/pocketnet-team/pocketnet-node-doctor/tests/integration/testdata/rigs"
 )
@@ -129,16 +126,6 @@ func computeTrustRoot(t *testing.T, fixtureName string) string {
 	if err != nil {
 		t.Fatalf("read fixture: %v", err)
 	}
-	dec := json.NewDecoder(bytes.NewReader(raw))
-	dec.UseNumber()
-	var generic any
-	if err := dec.Decode(&generic); err != nil {
-		t.Fatalf("decode: %v", err)
-	}
-	canon, err := canonform.Marshal(generic)
-	if err != nil {
-		t.Fatalf("canonform: %v", err)
-	}
-	sum := sha256.Sum256(canon)
+	sum := sha256.Sum256(raw)
 	return hex.EncodeToString(sum[:])
 }

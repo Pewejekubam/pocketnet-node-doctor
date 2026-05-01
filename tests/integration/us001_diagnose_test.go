@@ -284,25 +284,27 @@ func newDiagnoseRig(t *testing.T, scenario diagnoseScenario) *diagnoseRig {
 		},
 		TrustAnchors: json.RawMessage(`[]`),
 	}
-	manifestBytes, err := json.Marshal(m)
+	// Serialize via canonform so the server serves canonical JSON. Verify now
+	// hashes raw bytes, so the server response must equal the canonform bytes
+	// from which the trust-root was computed.
+	raw, err := json.Marshal(m)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Compute trust-root from canonform of generic-parsed manifestBytes.
-	dec := json.NewDecoder(bytes.NewReader(manifestBytes))
+	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.UseNumber()
 	var generic any
 	if err := dec.Decode(&generic); err != nil {
 		t.Fatal(err)
 	}
-	canon, err := canonform.Marshal(generic)
+	manifestBytes, err := canonform.Marshal(generic)
 	if err != nil {
 		t.Fatal(err)
 	}
-	sum := sha256.Sum256(canon)
+	sum := sha256.Sum256(manifestBytes)
 	trustRoot := hex.EncodeToString(sum[:])
 
-	// TLS server.
+	// TLS server serves canonical-form JSON.
 	mux := http.NewServeMux()
 	mux.HandleFunc("/manifest.json", func(w http.ResponseWriter, req *http.Request) {
 		w.Write(manifestBytes)

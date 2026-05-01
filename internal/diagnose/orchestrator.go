@@ -2,8 +2,6 @@ package diagnose
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strings"
@@ -52,22 +50,13 @@ func Diagnose(ctx context.Context, opts Options) (exitcode.Code, error) {
 		return res.Refused.Code, fmt.Errorf("%s", res.Refused.Diagnostic)
 	}
 
-	// 2. Manifest fetch + verify + parse + format_version + trust_anchors
-	body, err := manifest.Fetch(ctx, opts.CanonicalURL, opts.Transport)
+	// 2. Manifest fetch + verify + parse + format_version + trust_anchors.
+	// fetchManifest scopes the raw body bytes to a helper so they are eligible
+	// for GC before the memory-intensive hash phase begins (the parsed struct
+	// for a 151 GB database is ~3.3 GB; holding body + struct simultaneously
+	// would double peak RSS).
+	m, err := fetchManifest(ctx, opts.CanonicalURL, opts.PinnedHash, opts.Transport, logger)
 	if err != nil {
-		logger.Info("manifest fetch failed: %v", err)
-		return exitcode.GenericError, err
-	}
-	if err := manifest.Verify(body, opts.PinnedHash); err != nil {
-		logger.Info("manifest verify failed: %v", err)
-		if manifest.IsTrustRootMismatch(err) {
-			return exitcode.GenericError, err
-		}
-		return exitcode.GenericError, err
-	}
-	m, err := manifest.Parse(body)
-	if err != nil {
-		logger.Info("manifest parse failed: %v", err)
 		return exitcode.GenericError, err
 	}
 	if err := manifest.CheckFormatVersion(m); err != nil {
@@ -104,7 +93,6 @@ func Diagnose(ctx context.Context, opts Options) (exitcode.Code, error) {
 	}
 
 	// 6. Plan emission
-	manifestHash := sha256OfBytes(body)
 	p := plan.Plan{
 		FormatVersion: plan.FormatVersion,
 		CanonicalIdentity: plan.CanonicalIdentity{
@@ -119,7 +107,6 @@ func Diagnose(ctx context.Context, opts Options) (exitcode.Code, error) {
 		return exitcode.GenericError, err
 	}
 	p.SelfHash = selfHash
-	_ = manifestHash // for future use; the canonical-identity manifest_hash uses the verified pinned hash
 
 	if err := WritePlanAtomic(p, opts.PlanOutPath); err != nil {
 		logger.Info("plan write failed: %v", err)
@@ -130,6 +117,27 @@ func Diagnose(ctx context.Context, opts Options) (exitcode.Code, error) {
 	EmitSummary(stderrWriter(logger), p, m)
 
 	return exitcode.Success, nil
+}
+
+// fetchManifest fetches, verifies, and parses the manifest. Scoped as a
+// helper so the raw body bytes go out of scope (eligible for GC) before
+// the hash phase allocates memory for page comparison.
+func fetchManifest(ctx context.Context, url, pinnedHash string, transport http.RoundTripper, logger *stderrlog.Logger) (*manifest.Manifest, error) {
+	body, err := manifest.Fetch(ctx, url, transport)
+	if err != nil {
+		logger.Info("manifest fetch failed: %v", err)
+		return nil, err
+	}
+	if err := manifest.Verify(body, pinnedHash); err != nil {
+		logger.Info("manifest verify failed: %v", err)
+		return nil, err
+	}
+	m, err := manifest.Parse(body)
+	if err != nil {
+		logger.Info("manifest parse failed: %v", err)
+		return nil, err
+	}
+	return m, nil
 }
 
 // computeDivergences runs page-compare on sqlite_pages entries and file-compare
@@ -179,11 +187,6 @@ func classOf(path string) string {
 		return path[:i]
 	}
 	return path
-}
-
-func sha256OfBytes(b []byte) string {
-	sum := sha256.Sum256(b)
-	return hex.EncodeToString(sum[:])
 }
 
 // stderrWriter exposes the logger's underlying writer for io.Writer-shaped

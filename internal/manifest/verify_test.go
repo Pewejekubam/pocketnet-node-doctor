@@ -1,19 +1,15 @@
 package manifest
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/pocketnet-team/pocketnet-node-doctor/internal/canonform"
 )
 
-// T026: Verify re-serializes via canonform and compares SHA-256 to pinnedHash.
+// T026: Verify hashes raw manifest bytes and compares SHA-256 to pinnedHash.
 // PASS when computed == pinned; REFUSE with TrustRootMismatchError when ≠.
 func TestVerify_ValidV1_PassesAgainstComputedTrustRoot(t *testing.T) {
 	raw := readFixture(t, "valid_v1.json")
@@ -43,9 +39,10 @@ func TestVerify_TamperedManifest_ReturnsTrustRootMismatch(t *testing.T) {
 	}
 }
 
-func TestVerify_InvalidJSON_ReturnsError(t *testing.T) {
-	if err := Verify([]byte("not json"), "deadbeef"); err == nil {
-		t.Errorf("want error on invalid JSON")
+func TestVerify_WrongPinnedHash_ReturnsTrustRootMismatch(t *testing.T) {
+	raw := readFixture(t, "valid_v1.json")
+	if err := Verify(raw, "deadbeef"); err == nil {
+		t.Errorf("want TrustRootMismatchError for wrong pinned hash; got nil")
 	}
 }
 
@@ -60,17 +57,6 @@ func readFixture(t *testing.T, name string) []byte {
 
 func computeTrustRoot(t *testing.T, raw []byte) string {
 	t.Helper()
-	// Parse generic, canonform, sha256 — the same pipeline Verify uses.
-	dec := json.NewDecoder(bytes.NewReader(raw))
-	dec.UseNumber()
-	var generic any
-	if err := dec.Decode(&generic); err != nil {
-		t.Fatalf("decode for trust-root: %v", err)
-	}
-	canon, err := canonform.Marshal(generic)
-	if err != nil {
-		t.Fatalf("canonform: %v", err)
-	}
-	sum := sha256.Sum256(canon)
+	sum := sha256.Sum256(raw)
 	return hex.EncodeToString(sum[:])
 }
