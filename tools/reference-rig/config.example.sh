@@ -41,12 +41,21 @@ REFERENCE_RIG_SMB_SHARE_PATH="<absolute-smb-share-path>"
 REFERENCE_RIG_FREE_SPACE_REQUIRED_BYTES="$((50 * 1024 * 1024 * 1024))"
 
 # ----- Resource budgets (cgroup v2 via systemd-run --user --scope) -----
-# Slice name; pick something namespaced to this harness.
+# Slice name; pick something namespaced to this harness. The slice is
+# primarily a kill-switch handle (`systemctl --user stop $REFERENCE_RIG_SLICE`)
+# and a process-grouping mechanism, NOT a resource clamp by default.
 REFERENCE_RIG_SLICE="pnd-reference-rig.slice"
-REFERENCE_RIG_CPU_WEIGHT="20"
-REFERENCE_RIG_IO_WEIGHT="10"
-REFERENCE_RIG_MEMORY_HIGH="4G"
-REFERENCE_RIG_MEMORY_MAX="8G"
+# Default to fair-share weights (100 = default). Set lower (e.g., 20) only on
+# rigs whose primary workload is compute-intolerant of test-time contention;
+# the chunk-002 reference rig is production-critical but compute-tolerant, so
+# fair-share is appropriate.
+REFERENCE_RIG_CPU_WEIGHT="100"
+REFERENCE_RIG_IO_WEIGHT="100"
+# Memory caps left unset by default — the harness inherits the rig's full
+# physical memory minus what the kernel/primary workload reserves. Set
+# explicit caps here only if you observe contention with another workload.
+REFERENCE_RIG_MEMORY_HIGH=""
+REFERENCE_RIG_MEMORY_MAX=""
 
 # ----- Healthcheck -----
 # Space-separated list of systemd unit names that must be `active (running)`

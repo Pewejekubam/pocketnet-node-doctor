@@ -30,7 +30,7 @@ fi
 SQLITE_PATH="$1"; shift
 
 # Pre-flight: rig health.
-"$HARNESS_DIR/healthcheck.sh" --json /dev/null
+"$HARNESS_DIR/healthcheck.sh" >&2
 
 # Defaults sourced from config.local.sh; overridable per-invocation.
 BLOCK_HEIGHT="${REFERENCE_RIG_MANIFEST_BLOCK_HEIGHT:-0}"

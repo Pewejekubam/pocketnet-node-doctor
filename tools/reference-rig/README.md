@@ -56,14 +56,19 @@ $EDITOR tools/reference-rig/config.local.sh
 
 ## Resource-budget posture
 
-Every `run.sh` invocation wraps the test in a `systemd-run --user --scope --slice=$REFERENCE_RIG_SLICE` container with cgroup v2 limits sourced from `config.local.sh`:
+Every `run.sh` invocation wraps the test in a `systemd-run --user --scope --slice=$REFERENCE_RIG_SLICE` container. The slice is primarily a **kill-switch handle** and a process-grouping mechanism, not a resource clamp.
 
-- `IOWeight=$REFERENCE_RIG_IO_WEIGHT` (default 10 — deprioritized vs. host primary workload)
-- `CPUWeight=$REFERENCE_RIG_CPU_WEIGHT` (default 20)
-- `MemoryHigh=$REFERENCE_RIG_MEMORY_HIGH` (default 4G; soft cap)
-- `MemoryMax=$REFERENCE_RIG_MEMORY_MAX` (default 8G; hard cap, OOM-kill on breach)
+Defaults (fair-share, no caps):
 
-Belt-and-suspenders: every invocation is also wrapped in `nice 19 ionice -c2 -n7`.
+- `CPUWeight=100`, `IOWeight=100` — the test gets a fair share alongside any other workload on the rig
+- `MemoryHigh` / `MemoryMax` unset — the test inherits the rig's full physical memory
+
+When to override (in `config.local.sh`):
+
+- **Compute-intolerant primary workload on the rig**: lower `REFERENCE_RIG_CPU_WEIGHT` and `REFERENCE_RIG_IO_WEIGHT` (e.g., 20) so any contention yields to the primary workload.
+- **Memory contention with another workload**: set `REFERENCE_RIG_MEMORY_HIGH` and/or `REFERENCE_RIG_MEMORY_MAX` to bound test-side allocation.
+
+The chunk-002 reference rig is production-critical but compute-tolerant during normal hours, so the fair-share defaults are appropriate; explicit caps are an opt-in when needed.
 
 **Kill switch:**
 ```sh

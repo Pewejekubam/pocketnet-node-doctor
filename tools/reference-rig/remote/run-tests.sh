@@ -62,21 +62,29 @@ manifest_url="${REFERENCE_RIG_MANIFEST_URL:-https://127.0.0.1:18443/manifest.jso
 
 # Resource-budget wrapper. systemd-run --user --scope ties lifetime to the
 # ssh session; the slice gets cgroup limits applied.
+# Build cgroup property list from optional vars. Weights always set; memory
+# caps only set when explicitly configured (empty = use rig defaults).
+props=(
+  --property="CPUWeight=${REFERENCE_RIG_CPU_WEIGHT:-100}"
+  --property="IOWeight=${REFERENCE_RIG_IO_WEIGHT:-100}"
+)
+[[ -n "${REFERENCE_RIG_MEMORY_HIGH:-}" ]] && props+=(--property="MemoryHigh=$REFERENCE_RIG_MEMORY_HIGH")
+[[ -n "${REFERENCE_RIG_MEMORY_MAX:-}" ]]  && props+=(--property="MemoryMax=$REFERENCE_RIG_MEMORY_MAX")
+
 start_ts="$(date -u +%s)"
 set +e
-nice -n 19 ionice -c2 -n7 \
-  systemd-run --user --scope \
-    --slice="$REFERENCE_RIG_SLICE" \
-    --property="CPUWeight=$REFERENCE_RIG_CPU_WEIGHT" \
-    --property="IOWeight=$REFERENCE_RIG_IO_WEIGHT" \
-    --property="MemoryHigh=$REFERENCE_RIG_MEMORY_HIGH" \
-    --property="MemoryMax=$REFERENCE_RIG_MEMORY_MAX" \
-    "$bin" diagnose \
-      --canonical "$manifest_url" \
-      --pocketdb "$work" \
-      --plan-out "$plan_out" \
-      --verbose \
-    > "$stdout_log" 2> "$stderr_log"
+# Prepend $REFERENCE_RIG_BASE/bin to PATH so the doctor's version-mismatch
+# predicate finds the rig-side pocketnet-core stub.
+systemd-run --user --scope \
+  --slice="$REFERENCE_RIG_SLICE" \
+  "${props[@]}" \
+  --setenv="PATH=$REFERENCE_RIG_BASE/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+  "$bin" diagnose \
+    --canonical "$manifest_url" \
+    --pocketdb "$work" \
+    --plan-out "$plan_out" \
+    --verbose \
+  > "$stdout_log" 2> "$stderr_log"
 exit_code=$?
 end_ts="$(date -u +%s)"
 set -e

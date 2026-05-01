@@ -32,7 +32,7 @@ if [[ ! "$PINNED_HASH" =~ ^[0-9a-f]{64}$ ]]; then
 fi
 
 # Pre-flight: rig health.
-"$HARNESS_DIR/healthcheck.sh" --json /dev/null
+"$HARNESS_DIR/healthcheck.sh" >&2
 
 SHA="$(git_short_hash)"
 COMMIT="$(git -C "$REPO_ROOT" rev-parse HEAD)"
@@ -59,6 +59,24 @@ echo "==> rsync binary -> $REFERENCE_RIG_BASE/bin/"
 ssh_rig "mkdir -p '$REFERENCE_RIG_BASE/bin' '$REFERENCE_RIG_BASE/deploy' '$REFERENCE_RIG_BASE/runs'"
 rsync_to_rig "$BIN_LOCAL" "$REFERENCE_RIG_BASE/bin/"
 rsync_to_rig "$HARNESS_DIR/remote/" "$REFERENCE_RIG_BASE/deploy/"
+
+# Drop a pocketnet-core stub so the version-mismatch predicate has something
+# to invoke. The reference rig is a storage head (no pocketnet-core service)
+# but the doctor's version-mismatch predicate requires `pocketnet-core
+# --version` to return the canonical version. The stub returns whatever
+# REFERENCE_RIG_MANIFEST_CORE_VERSION is set to in config.local.sh.
+echo "==> Installing pocketnet-core version stub on rig"
+core_version="${REFERENCE_RIG_MANIFEST_CORE_VERSION:-0.21.16-test}"
+ssh_rig "cat > '$REFERENCE_RIG_BASE/bin/pocketnet-core' <<'STUB_EOF'
+#!/usr/bin/env bash
+# Reference-rig stub: storage-head has no real pocketnet-core; this stub
+# satisfies the doctor's version-mismatch predicate.
+case \"\$1\" in
+  --version) echo '$core_version' ;;
+  *) echo 'pocketnet-core (stub): only --version is implemented' >&2; exit 64 ;;
+esac
+STUB_EOF
+chmod +x '$REFERENCE_RIG_BASE/bin/pocketnet-core'"
 
 REMOTE_SHA256="$(ssh_rig "sha256sum '$REFERENCE_RIG_BASE/bin/$(basename "$BIN_LOCAL")' | awk '{print \$1}'")"
 if [[ "$LOCAL_SHA256" != "$REMOTE_SHA256" ]]; then
