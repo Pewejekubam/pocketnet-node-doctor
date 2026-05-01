@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"runtime"
 	"strings"
 
 	"github.com/pocketnet-team/pocketnet-node-doctor/internal/exitcode"
@@ -54,11 +55,14 @@ func Diagnose(ctx context.Context, opts Options) (exitcode.Code, error) {
 	// fetchManifest scopes the raw body bytes to a helper so they are eligible
 	// for GC before the memory-intensive hash phase begins (the parsed struct
 	// for a 151 GB database is ~3.3 GB; holding body + struct simultaneously
-	// would double peak RSS).
+	// would double peak RSS). Force a GC pass immediately after to reclaim the
+	// body bytes — the default GOGC=100 would otherwise not trigger until the
+	// heap doubles again, which exceeds available RAM on the reference rig.
 	m, err := fetchManifest(ctx, opts.CanonicalURL, opts.PinnedHash, opts.Transport, logger)
 	if err != nil {
 		return exitcode.GenericError, err
 	}
+	runtime.GC()
 	if err := manifest.CheckFormatVersion(m); err != nil {
 		logger.Info("manifest format_version refused: %v", err)
 		if manifest.IsFormatVersionUnrecognized(err) {
