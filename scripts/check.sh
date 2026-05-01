@@ -3,6 +3,10 @@
 # Per plan.md D2/D3: zero runtime dependencies, minimal toolchain footprint.
 set -euo pipefail
 
+# Force the local Go toolchain (1.23+) and refuse to auto-download newer
+# toolchains for transitive deps. This is the project's build posture.
+export GOTOOLCHAIN=local
+
 cd "$(dirname "$0")/.."
 
 echo "==> gofmt -l (any output = unformatted files; exit non-zero)"
