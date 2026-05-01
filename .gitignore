@@ -71,6 +71,10 @@ build/
 coverage.out
 testdata/reference/*.bin
 
+# Reference-rig dev-host caches (per-developer)
+/.build/
+/pnd-reference-rig-results/
+
 # ============================================================
 # LOGS & RUNTIME
 # ============================================================
