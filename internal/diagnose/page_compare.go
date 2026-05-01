@@ -15,6 +15,10 @@ import (
 // <pocketdbRoot>/<entry.Path>, comparing each (offset, hash) against the
 // manifest's per-page hash. Returns the divergent pages.
 //
+// Both the manifest Pages slice and HashSQLitePages iterate in ascending
+// offset order, so comparison is a single merge-pass with O(1) extra memory —
+// no intermediate maps are built.
+//
 // Special cases:
 //   - File missing: every canonical page becomes a divergent entry.
 //   - File shorter than canonical: every page beyond the local file's end
@@ -27,13 +31,7 @@ func ComparePages(pocketdbRoot string, entry manifest.Entry) ([]plan.Page, error
 	}
 	path := joinRel(pocketdbRoot, entry.Path)
 
-	// Build canonical lookup: offset -> hash
-	canonical := make(map[int64]string, len(entry.Pages))
-	for _, p := range entry.Pages {
-		canonical[p.Offset] = p.Hash
-	}
-
-	// Open local file. Missing → all canonical pages diverge.
+	// File missing → all canonical pages diverge.
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		out := make([]plan.Page, 0, len(entry.Pages))
 		for _, p := range entry.Pages {
@@ -48,33 +46,59 @@ func ComparePages(pocketdbRoot string, entry manifest.Entry) ([]plan.Page, error
 		return nil, fmt.Errorf("page-compare: hash: %w", err)
 	}
 
-	matched := make(map[int64]bool)
+	// Merge-compare: manifest pages and local pages are both in ascending
+	// offset order. Walk them with a single index into entry.Pages.
+	manifPages := entry.Pages
+	manifIdx := 0
 	var divergent []plan.Page
+
 	for ph, ierr := range seq {
 		if ierr != nil {
 			if errors.Is(ierr, io.ErrUnexpectedEOF) {
-				// Page-misalignment: stop; remaining canonical pages will be
-				// reported as divergent below.
+				// Page-misalignment: stop; remaining canonical pages reported below.
 				break
 			}
 			return nil, fmt.Errorf("page-compare: %w", ierr)
 		}
-		want, ok := canonical[ph.Offset]
-		if !ok {
-			// Local has a page beyond canonical's coverage; ignore.
-			continue
+
+		// Advance past any canonical pages whose offset is less than the
+		// current local page — these are gaps in the local file (should not
+		// happen for a well-formed SQLite, but treated as divergent below).
+		for manifIdx < len(manifPages) && manifPages[manifIdx].Offset < ph.Offset {
+			divergent = append(divergent, plan.Page{
+				Offset:       manifPages[manifIdx].Offset,
+				ExpectedHash: manifPages[manifIdx].Hash,
+			})
+			manifIdx++
 		}
-		matched[ph.Offset] = true
-		if ph.Hash != want {
-			divergent = append(divergent, plan.Page{Offset: ph.Offset, ExpectedHash: want})
+
+		if manifIdx >= len(manifPages) {
+			// Local has pages beyond canonical's coverage; ignore.
+			break
 		}
+
+		if manifPages[manifIdx].Offset == ph.Offset {
+			// Matching offset: compare hashes.
+			if ph.Hash != manifPages[manifIdx].Hash {
+				divergent = append(divergent, plan.Page{
+					Offset:       ph.Offset,
+					ExpectedHash: manifPages[manifIdx].Hash,
+				})
+			}
+			manifIdx++
+		}
+		// If manifPages[manifIdx].Offset > ph.Offset: extra local page not in
+		// canonical; ignore it.
 	}
-	// Any canonical page not matched → file is shorter than canonical; emit divergent.
-	for _, p := range entry.Pages {
-		if !matched[p.Offset] {
-			divergent = append(divergent, plan.Page{Offset: p.Offset, ExpectedHash: p.Hash})
-		}
+
+	// Canonical pages not reached by the local file → divergent.
+	for ; manifIdx < len(manifPages); manifIdx++ {
+		divergent = append(divergent, plan.Page{
+			Offset:       manifPages[manifIdx].Offset,
+			ExpectedHash: manifPages[manifIdx].Hash,
+		})
 	}
+
 	sortPages(divergent)
 	return divergent, nil
 }
