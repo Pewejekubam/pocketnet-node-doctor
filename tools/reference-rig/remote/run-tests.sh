@@ -36,11 +36,13 @@ if [[ ! -d "$src" ]]; then
 fi
 
 work="$REFERENCE_RIG_BASE/pocketdb-rigs/$baseline_subdir"
+# Always reset the working copy so stale state from prior runs cannot persist.
+rm -rf "$work"
 mkdir -p "$work"
 
 # cp-on-test (reflink if available — instant on btrfs/xfs with reflink support).
 echo "==> staging $src -> $work (cp --reflink=auto)"
-cp --reflink=auto -an "$src/." "$work/"
+cp --reflink=auto -a "$src/." "$work/"
 
 # Resolve the deployed binary (latest by mtime).
 bin="$(ls -1t "$REFERENCE_RIG_BASE/bin/pocketnet-node-doctor-"* 2>/dev/null | head -1)"
