@@ -79,6 +79,7 @@ systemd-run --user --scope \
   --slice="$REFERENCE_RIG_SLICE" \
   "${props[@]}" \
   --setenv="PATH=$REFERENCE_RIG_BASE/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" \
+  --setenv="GOMEMLIMIT=12GiB" \
   "$bin" diagnose \
     --canonical "$manifest_url" \
     --pocketdb "$work" \
