@@ -29,10 +29,10 @@ Idiomatic Go layout (per plan.md § Project Structure):
 
 **Purpose**: Project-skeleton initialization. This is the first chunk that introduces in-repo source code.
 
-- [ ] T001 Initialize `go.mod` at repo root with module path `github.com/pocketnet-team/pocketnet-node-doctor` and Go 1.23+ minimum (per plan.md D1; iterator API in D14 requires 1.23). Pin specific minor version from current stable.
-- [ ] T002 [P] Create skeleton directory tree: `cmd/pocketnet-node-doctor/`, `internal/{cli,diagnose,preflight,manifest,plan,canonform,hashutil,exitcode,stderrlog,trustroot,buildinfo}/`, `tests/{contract,integration}/`, `testdata/{small,reference}/`. Empty `doc.go` per package to make Go-toolchain-recognizable.
-- [ ] T003 [P] Add `go.sum` placeholder + `.gitignore` entries for build artifacts (`pocketnet-node-doctor`, `*.test`, `coverage.out`, `testdata/reference/*.bin`).
-- [ ] T004 [P] Configure `gofmt` + `go vet` as the lint posture (no third-party linters in v1; matches "no runtime deps" pin from plan.md D2/D3 spirit). Document in repo root README or scripts/check.sh.
+- [X] T001 Initialize `go.mod` at repo root with module path `github.com/pocketnet-team/pocketnet-node-doctor` and Go 1.23+ minimum (per plan.md D1; iterator API in D14 requires 1.23). Pin specific minor version from current stable.
+- [X] T002 [P] Create skeleton directory tree: `cmd/pocketnet-node-doctor/`, `internal/{cli,diagnose,preflight,manifest,plan,canonform,hashutil,exitcode,stderrlog,trustroot,buildinfo}/`, `tests/{contract,integration}/`, `testdata/{small,reference}/`. Empty `doc.go` per package to make Go-toolchain-recognizable.
+- [X] T003 [P] Add `go.sum` placeholder + `.gitignore` entries for build artifacts (`pocketnet-node-doctor`, `*.test`, `coverage.out`, `testdata/reference/*.bin`).
+- [X] T004 [P] Configure `gofmt` + `go vet` as the lint posture (no third-party linters in v1; matches "no runtime deps" pin from plan.md D2/D3 spirit). Document in repo root README or scripts/check.sh.
 
 **Checkpoint**: Project compiles (`go build ./...` returns clean even with empty packages).
 
@@ -46,32 +46,32 @@ Idiomatic Go layout (per plan.md § Project Structure):
 
 ### Foundational fixtures
 
-- [ ] T005 [P] Create canonform test fixtures in `internal/canonform/testdata/`: pairs of equivalent JSON inputs (different key orderings, varying whitespace) and the expected canonical-form bytes for each.
-- [ ] T006 [P] Create hashutil test fixtures in `internal/hashutil/testdata/`: a small synthetic SQLite-shaped page file (deterministic per-page bytes; pageSize=4096, ~16 pages) and a small whole-file fixture (a few KB of arbitrary bytes); record expected SHA-256 values in `expected.txt`.
+- [X] T005 [P] Create canonform test fixtures in `internal/canonform/testdata/`: pairs of equivalent JSON inputs (different key orderings, varying whitespace) and the expected canonical-form bytes for each.
+- [X] T006 [P] Create hashutil test fixtures in `internal/hashutil/testdata/`: a small synthetic SQLite-shaped page file (deterministic per-page bytes; pageSize=4096, ~16 pages) and a small whole-file fixture (a few KB of arbitrary bytes); record expected SHA-256 values in `expected.txt`.
 
 ### Foundational RED tests (write first; expected to fail)
 
-- [ ] T007 [P] `internal/canonform/canonform_test.go` — `Marshal(any) ([]byte, error)` produces sorted-keys, no-insignificant-whitespace, UTF-8 bytes per pre-spec Implementation Context. Round-trip stability: same input → same bytes regardless of source key order.
-- [ ] T008 [P] `internal/exitcode/exitcode_test.go` — typed sentinel constants `Success=0`, `GenericError=1`, `RunningNode=2`, `AheadOfCanonical=3`, `VersionMismatch=4`, `Capacity=5`, `PermissionReadOnly=6`, `ManifestFormatVersionUnrecognized=7` per cli-surface.md § Exit code allocation.
-- [ ] T009 [P] `internal/stderrlog/stderrlog_test.go` — `Logger.Info(format, args...)` always writes; `Logger.Debug(format, args...)` gated on `verbose=true`; output destination is `os.Stderr`; nothing written to `os.Stdout` (D16).
-- [ ] T010 [P] `internal/hashutil/whole_file_test.go` — `HashWholeFile(path) (string, error)` returns lowercase 64-hex SHA-256, streamed via 1 MiB buffer (D14); compares against fixture's `expected.txt`.
-- [ ] T011 [P] `internal/hashutil/sqlite_pages_test.go` — `HashSQLitePages(path, pageSize) (iter.Seq2[PageHash, error], error)` (Go 1.23+ iterator) yields `{offset, hash}` per page, `offset` non-negative multiple of `pageSize`, sorted ascending; compares against fixture's `expected.txt`.
-- [ ] T012 [P] `internal/buildinfo/buildinfo_test.go` — `Version`, `Commit`, `BuildDate` are package-level `var`s overridable via `-ldflags -X` per D11 mechanism (mirror).
-- [ ] T013 [P] `internal/trustroot/trustroot_test.go` — `PinnedHash` defaults to `a939828d349bc5259d2c79fe9251d4e3497d2d1518c944dfc91ae9594f029249` (v1 development trust-root per pre-spec Implementation Context); ldflags-overridable shape verified by reflection or build-tag test.
+- [X] T007 [P] `internal/canonform/canonform_test.go` — `Marshal(any) ([]byte, error)` produces sorted-keys, no-insignificant-whitespace, UTF-8 bytes per pre-spec Implementation Context. Round-trip stability: same input → same bytes regardless of source key order.
+- [X] T008 [P] `internal/exitcode/exitcode_test.go` — typed sentinel constants `Success=0`, `GenericError=1`, `RunningNode=2`, `AheadOfCanonical=3`, `VersionMismatch=4`, `Capacity=5`, `PermissionReadOnly=6`, `ManifestFormatVersionUnrecognized=7` per cli-surface.md § Exit code allocation.
+- [X] T009 [P] `internal/stderrlog/stderrlog_test.go` — `Logger.Info(format, args...)` always writes; `Logger.Debug(format, args...)` gated on `verbose=true`; output destination is `os.Stderr`; nothing written to `os.Stdout` (D16).
+- [X] T010 [P] `internal/hashutil/whole_file_test.go` — `HashWholeFile(path) (string, error)` returns lowercase 64-hex SHA-256, streamed via 1 MiB buffer (D14); compares against fixture's `expected.txt`.
+- [X] T011 [P] `internal/hashutil/sqlite_pages_test.go` — `HashSQLitePages(path, pageSize) (iter.Seq2[PageHash, error], error)` (Go 1.23+ iterator) yields `{offset, hash}` per page, `offset` non-negative multiple of `pageSize`, sorted ascending; compares against fixture's `expected.txt`.
+- [X] T012 [P] `internal/buildinfo/buildinfo_test.go` — `Version`, `Commit`, `BuildDate` are package-level `var`s overridable via `-ldflags -X` per D11 mechanism (mirror).
+- [X] T013 [P] `internal/trustroot/trustroot_test.go` — `PinnedHash` defaults to `a939828d349bc5259d2c79fe9251d4e3497d2d1518c944dfc91ae9594f029249` (v1 development trust-root per pre-spec Implementation Context); ldflags-overridable shape verified by reflection or build-tag test.
 
 ### Foundational implementations (make tests pass)
 
-- [ ] T014 [P] `internal/canonform/canonform.go` — `Marshal(any) ([]byte, error)`. Implement sorted-keys + no-insignificant-whitespace JSON via custom encoder or stdlib `encoding/json` + post-process; UTF-8 enforced; trailing newline NOT emitted (consumers SHA-256 the exact bytes).
-- [ ] T015 [P] `internal/exitcode/exitcode.go` — typed `Code int` with sentinel constants per T008.
-- [ ] T016 [P] `internal/stderrlog/stderrlog.go` — `Logger` struct wrapping `os.Stderr`; `New(verbose bool) *Logger`; `Info`/`Debug` methods. No structured logging (D16).
-- [ ] T017 [P] `internal/hashutil/whole_file.go` — `HashWholeFile(path string) (string, error)` using `crypto/sha256` streaming with 1 MiB buffer.
-- [ ] T018 [P] `internal/hashutil/sqlite_pages.go` — `HashSQLitePages(path string, pageSize int) (iter.Seq2[PageHash, error], error)`; `PageHash struct { Offset int64; Hash string }`; per-page exact-`pageSize` reads; emit `{offset, hash}` per page.
-- [ ] T019 [P] `internal/buildinfo/buildinfo.go` — `var Version, Commit, BuildDate string` — populated at build via `-ldflags -X internal/buildinfo.<field>=<value>`.
-- [ ] T020 [P] `internal/trustroot/trustroot.go` — `var PinnedHash = "a939828d349bc5259d2c79fe9251d4e3497d2d1518c944dfc91ae9594f029249"`. Override mechanism: `go build -ldflags "-X internal/trustroot.PinnedHash=<hex>"` per D11.
+- [X] T014 [P] `internal/canonform/canonform.go` — `Marshal(any) ([]byte, error)`. Implement sorted-keys + no-insignificant-whitespace JSON via custom encoder or stdlib `encoding/json` + post-process; UTF-8 enforced; trailing newline NOT emitted (consumers SHA-256 the exact bytes).
+- [X] T015 [P] `internal/exitcode/exitcode.go` — typed `Code int` with sentinel constants per T008.
+- [X] T016 [P] `internal/stderrlog/stderrlog.go` — `Logger` struct wrapping `os.Stderr`; `New(verbose bool) *Logger`; `Info`/`Debug` methods. No structured logging (D16).
+- [X] T017 [P] `internal/hashutil/whole_file.go` — `HashWholeFile(path string) (string, error)` using `crypto/sha256` streaming with 1 MiB buffer.
+- [X] T018 [P] `internal/hashutil/sqlite_pages.go` — `HashSQLitePages(path string, pageSize int) (iter.Seq2[PageHash, error], error)`; `PageHash struct { Offset int64; Hash string }`; per-page exact-`pageSize` reads; emit `{offset, hash}` per page.
+- [X] T019 [P] `internal/buildinfo/buildinfo.go` — `var Version, Commit, BuildDate string` — populated at build via `-ldflags -X internal/buildinfo.<field>=<value>`.
+- [X] T020 [P] `internal/trustroot/trustroot.go` — `var PinnedHash = "a939828d349bc5259d2c79fe9251d4e3497d2d1518c944dfc91ae9594f029249"`. Override mechanism: `go build -ldflags "-X internal/trustroot.PinnedHash=<hex>"` per D11.
 
 ### Foundational GREEN verification
 
-- [ ] T021 Run `go test ./internal/canonform/... ./internal/exitcode/... ./internal/stderrlog/... ./internal/hashutil/... ./internal/buildinfo/... ./internal/trustroot/...` and confirm all foundational tests pass.
+- [X] T021 Run `go test ./internal/canonform/... ./internal/exitcode/... ./internal/stderrlog/... ./internal/hashutil/... ./internal/buildinfo/... ./internal/trustroot/...` and confirm all foundational tests pass.
 
 **Checkpoint**: Foundational scaffolding green. User story phases may now begin in dependency order.
 
