@@ -2,7 +2,7 @@
 
 **Feature Branch**: `003-001-delta-recovery-client-chunk-002`
 **Created**: 2026-04-30
-**Status**: Draft
+**Status**: Verified
 **Input**: User description: "Chunk 002 (Client Foundation + Diagnose) of pocketnet-node-doctor. Implements the doctor's read-only pathway plus shared scaffolding: project skeleton, plan-format library, manifest verifier, hash utilities, diagnose phase (US-001), five pre-flight refusal predicates (US-003), and trust-root authentication (FR-017, FR-018). Authoritative sources: specs/001-delta-recovery-client/pre-spec-strategic-chunking.md §Chunk 002 and specs/001-delta-recovery-client/pre-spec.md."
 
 ## Clarifications
