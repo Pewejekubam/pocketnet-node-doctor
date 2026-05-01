@@ -65,6 +65,12 @@ build/
 .mypy_cache/
 .ruff_cache/
 
+# Go build artifacts (T003)
+/pocketnet-node-doctor
+*.test
+coverage.out
+testdata/reference/*.bin
+
 # ============================================================
 # LOGS & RUNTIME
 # ============================================================
